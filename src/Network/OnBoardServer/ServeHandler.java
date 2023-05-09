@@ -41,10 +41,6 @@ public class ServeHandler extends Thread {
         INSTANCE++;
         attachedToClient = true;
 
-        // multithreading instance
-        Thread.sleep(1000);
-        new ServeHandler(serverSocket).start();
-
         DataInputStream clientData = new DataInputStream(
                 new BufferedInputStream(clientSocket.getInputStream()));
         TimeUnit.SECONDS.sleep(1);
@@ -91,7 +87,7 @@ public class ServeHandler extends Thread {
     }
 
     public void sendOver() throws IOException {
-        socket = new Socket(PortHandler.serverAddress, PortHandler.clientRequestPort());
+        socket = new Socket(PortHandler.serverAddress, PortHandler.requestPort());
         outputStream = socket.getOutputStream();
     }
 

@@ -1,12 +1,18 @@
 package Network.OnBoardClient;
 import Main.Serialize;
 import Network.AuthToken;
+import Network.NetworkUtils;
 import Network.PortHandler;
 import Network.RequestToken;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class ClientHandler {
     protected ServerSocket serverSocket;
@@ -18,16 +24,21 @@ public class ClientHandler {
     protected AuthToken authToken;
 
 
-    public ClientHandler (String username, String password) {
+    public ClientHandler (String username, String password) throws Exception {
         try {
-            socket = new Socket("localhost", PortHandler.requestPort());
+            socket = PortHandler.generateSocket();
+            System.out.println("Connected with port address " + socket.getPort());
             authToken = new AuthToken(username, password);
-            signature = PortHandler.clientGetSignature();
+            signature = PortHandler.getClientSignature();
             serverSocket = new ServerSocket(signature);
             sendRequest(new RequestToken("AUTH", authToken, signature));
+            var authSocket = serverSocket.accept();
+            RequestToken token = NetworkUtils.getObject(authSocket);
+            System.out.println(token.response);
             // receiveRequest over here
         } catch (IOException e) {
             System.out.println("Error at ClientHandler constructor with error: " + e);
+            System.out.println("Error binding to port " + PortHandler.requestPort());
             e.printStackTrace();
         }
 
@@ -43,13 +54,14 @@ public class ClientHandler {
         // implement this later
     }
 
-    public void sendRequest(RequestToken requestToken) {
+    public void sendRequest(RequestToken requestToken) throws Exception {
         requestToken.signature = signature;
         try {
             socket.getOutputStream().write(Serialize.writeToBytes(requestToken));
         } catch (IOException e){
             System.out.println("An exception occurred with the sendRequest method with error: " + e);
             e.printStackTrace();
+            throw e;
         }
     }
 
