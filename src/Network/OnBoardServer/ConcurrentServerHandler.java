@@ -5,6 +5,7 @@ import Network.NetworkUtils;
 import Network.PortHandler;
 import Network.RequestToken;
 
+import javax.swing.*;
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
@@ -24,20 +25,16 @@ public class ConcurrentServerHandler {
 
     public ConcurrentServerHandler() {
         try (var serverSocket = new ServerSocket(PortHandler.requestPort())){
-            System.out.println("✅Connected with port address " + serverSocket.getLocalPort());
             while (true) {
+                System.out.println("The server is open and is awaiting for connections.");
                 socket = serverSocket.accept();
+                System.out.println("✅Connected with port address " + serverSocket.getLocalPort());
                 var requestToken = (RequestToken) NetworkUtils.getObject(socket);
                 System.out.println("There is a request for " + requestToken.requestFor);
                 var message = new ConcurrentMessaging(requestToken);
             }
-        } catch (IOException e){
-            System.out.println("An exception occurred in the ConcurrentServerHandler constructor with error: " + e);
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (Exception e){
-            // ignored
+            System.out.println("Exception occurred at ServerHandler object: " + e);
         }
     }
 

@@ -26,6 +26,11 @@ public class RequestToken implements Serializable {
     // for a response token.
     public int signature;
 
+    // The exception object is responsible for holding exceptions whenever an
+    // error occurs. It should be that the exception should be null
+    // if no error has occurred.
+    public Object exception = null;
+
     public RequestToken (){}
 
     public RequestToken (String requestFor, Object authentication, int signature) {

@@ -1,5 +1,6 @@
 package Network;
 
+import Main.SQLConnector;
 import Main.Serialize;
 
 import java.io.*;
@@ -30,7 +31,9 @@ public class NetworkUtils {
     public static void waitForBufferInstance (DataInputStream stream) {
         try {
             TimeUnit.MICROSECONDS.sleep(250);
-            while (stream.available() == 0) waitForBufferInstance(stream);
+            while (stream.available() == 0) {
+                // delay
+            }
         } catch (EOFException e){
             waitForBufferInstance(stream);
         } catch (IOException e) {
@@ -43,7 +46,9 @@ public class NetworkUtils {
         var stream = new DataInputStream(new BufferedInputStream(inputStream));
         try {
             TimeUnit.MICROSECONDS.sleep(250);
-            while (stream.available() == 0) waitForBufferInstance(stream);
+            while (stream.available() == 0) {
+                // delay
+            }
         } catch (EOFException e){
             waitForBufferInstance(stream);
         } catch (IOException e) {
@@ -51,6 +56,14 @@ public class NetworkUtils {
         } catch (Exception e) {
             System.out.println("Encountered time exception while waiting for buffer instance.");
         }
+    }
+
+    static SQLConnector connector;
+    public static SQLConnector sqlconnector() {
+        if (connector == null) {
+            connector = new SQLConnector();
+        } return  connector;
+
     }
 }
 

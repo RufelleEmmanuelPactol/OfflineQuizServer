@@ -7,8 +7,7 @@ import java.io.IOException;
 
 public class ClientMain {
     public static void main(String[] args) throws IOException, ClassNotFoundException, Exception {
-       ClientHandler clientHandler = new ClientHandler("user", "pass");
-       clientHandler.sendRequest(new RequestToken("QUIZ", 1));
+       ClientHandler clientHandler = new ClientHandler("kurapika@leorio.com", "BiscuitKrueger");
     }
 
 }
