@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="OffineQuizNetworking:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/OffineQuizNetworking_jar</output-path>
-    <root id="archive" name="OffineQuizNetworking.jar">
-      <element id="module-output" name="OffineQuizNetworking" />
-    </root>
-  </artifact>
-</component>
