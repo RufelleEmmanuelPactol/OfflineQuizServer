@@ -51,7 +51,7 @@ public class SQLConnector {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    public void postQuiz (Quiz quiz) throws IOException, SQLException {
+    public void postQuiz (Quiz quiz, User user) throws IOException, SQLException {
         var quizByteStream = Serialize.writeToBytes(quiz);
         var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob) values (null, ?)");
         prepared.setBytes(1, quizByteStream);

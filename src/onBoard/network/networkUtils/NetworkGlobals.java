@@ -66,4 +66,11 @@ public class NetworkGlobals {
     =============================== */
 
     public static boolean luckyMode = false;
+
+
+    /*===============================
+    ClassID status determining the
+    current class instance.
+    ================================ */
+    public static int classID;
 }

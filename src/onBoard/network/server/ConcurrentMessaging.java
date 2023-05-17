@@ -6,6 +6,7 @@ import onBoard.dataClasses.User;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.exceptions.InvalidRequestForHeader;
 import onBoard.network.networkUtils.*;
+import onBoard.quizUtilities.Quiz;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -77,7 +78,15 @@ public class ConcurrentMessaging extends Thread {
                 NetworkUtils.sendRequest(tkn, sendingSocket);
             } else if (tkn.requestFor.equals("CLOSE")) {
                 break;
-            } else if (tkn.requestFor.equals("POST")){
+            } else if (tkn.requestFor.equals("POSTQUIZ")){
+                var quiz = (Quiz)tkn.response;
+                System.out.println("There is a POST QUIZ request.");
+                NetworkUtils.sqlconnector().postQuiz(quiz, (User)tkn.authentication); // implement quiz
+            } else if (tkn.requestFor.equals("GETQUIZZES")){
+
+            } else if (tkn.requestFor.equals("ADDCLASS")){
+
+            } else if (tkn.requestFor.equals("POSTATTEMPT")){
 
             }
             else {
