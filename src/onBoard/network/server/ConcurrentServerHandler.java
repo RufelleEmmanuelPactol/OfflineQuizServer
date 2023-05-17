@@ -29,6 +29,7 @@ public class ConcurrentServerHandler {
                 /*
                 This area of the constructor asynchronously handles AUTH requests.
                  */
+
                 Thread thread = new Thread(new Runnable() {
                     @Override
                     public void run() {

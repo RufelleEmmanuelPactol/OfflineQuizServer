@@ -3,25 +3,47 @@ package onBoard.connectivity;
 import onBoard.dataClasses.User;
 import onBoard.network.networkUtils.AuthToken;
 import onBoard.network.exceptions.InvalidAuthException;
+import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.PortHandler;
 import onBoard.network.networkUtils.RequestToken;
 import onBoard.quizUtilities.Quiz;
-
+import java.util.Date;
+import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.*;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
+import java.time.chrono.ChronoLocalDate;
+import java.time.chrono.ChronoLocalDateTime;
 
 public class SQLConnector {
+    private static String lucky_creds = "user_for_school";
+    private static String user = "root";
+    public static boolean checkConnection(){
+
+        if (NetworkGlobals.luckyMode) {
+            user = lucky_creds;
+            System.out.println(user);
+        }
+
+        try {
+          var  connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, "");
+          var  statement = connection.createStatement();
+            statement.executeUpdate("USE dbonboard");
+        } catch (SQLException e) {
+            return false;
+        } return true;
+    }
     Connection connection;
     Statement statement;
 
     public SQLConnector() {
         try {
    //         connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306", "root", "");
-            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", "root", "");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, "");
             statement = connection.createStatement();
             statement.executeUpdate("USE dbonboard");
         } catch (SQLException e) {
@@ -54,6 +76,7 @@ public class SQLConnector {
             preparedStatement.setString(2, authentication.password);
             var set = preparedStatement.executeQuery();
             token.response = PortHandler.getNewRoom();
+
             if (!set.next()) {
                 token.exception = new InvalidAuthException();
                 return;

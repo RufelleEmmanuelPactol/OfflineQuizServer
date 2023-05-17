@@ -21,7 +21,8 @@ public class MultipleChoiceQuestion extends Question {
     @Override
     public boolean checkAnswer (Object ans) {
         var attempt = (Choice)ans;
-        return attempt.equals(correctAnswer) ? true : false;
+        isCorrect = attempt.equals(correctAnswer) ? true : false;
+        return isCorrect;
     }
 
     public MultipleChoiceQuestion addChoice (String choice){

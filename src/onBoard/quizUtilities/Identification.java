@@ -25,7 +25,8 @@ public class Identification extends Question {
         var answer = (String)ans;
         answer = transform(answer);
         var tempAnswer = transform(correctAnswer);
-        return  tempAnswer.equals(answer) ? true : false;
+        isCorrect = tempAnswer.equals(answer) ? true : false;
+        return isCorrect;
     }
 
     @Override

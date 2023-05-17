@@ -1,5 +1,6 @@
 package onBoard.quizUtilities;
 
+import onBoard.quizUtilities.MultipleChoice.MultipleAnswerQuestion;
 import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
 import onBoard.quizUtilities.MultipleChoice.Choice;
 import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
@@ -10,8 +11,8 @@ import java.util.ArrayList;
 public class Quiz implements Serializable {
     protected ArrayList<Question> questions;
     protected String quizName;
-    int teacherID;
-    int classID;
+    public int teacherID;
+    public int classID;
 
 
 
@@ -38,6 +39,18 @@ public class Quiz implements Serializable {
 
     public MultipleChoiceQuestion addMultipleChoiceQuestion (String question, int maxChoice, Choice correctAnswer, int replaceQuestionNo){
         MultipleChoiceQuestion q = new MultipleChoiceQuestion(question, maxChoice, correctAnswer);
+        questions.set(replaceQuestionNo + 1, q);
+        return q;
+    }
+
+    public MultipleAnswerQuestion addMultipleAnswerQuestion (String question, int maxChoice, Choice[] correctAnswer){
+        MultipleAnswerQuestion q = new MultipleAnswerQuestion(question, maxChoice, correctAnswer);
+        questions.add(q);
+        return q;
+    }
+
+    public MultipleAnswerQuestion addMultipleAnswerQuestion (String question, int maxChoice, Choice[] correctAnswer, int replaceQuestionNo){
+        MultipleAnswerQuestion q = new MultipleAnswerQuestion(question, maxChoice, correctAnswer);
         questions.set(replaceQuestionNo + 1, q);
         return q;
     }
@@ -71,6 +84,27 @@ public class Quiz implements Serializable {
             System.out.println("Question " + (i+1) + ": ");
             questions.get(i).log();
         }
+    }
+
+    /*
+    Returns the highest possible score.
+     */
+    public int getTotalMarks(){
+        int marks = 0;
+        for (var i : questions){
+            marks+=i.getMarks();
+        } return marks;
+    }
+
+    /*
+    Returns the user's score.
+     */
+    public int getMarks(){
+        int marks = 0;
+        for (var i : questions){
+            if (i.isCorrect())
+            marks+=i.getMarks();
+        } return marks;
     }
 
 

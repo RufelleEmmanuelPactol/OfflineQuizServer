@@ -1,10 +1,8 @@
 package onBoard.network.client;
 import onBoard.dataClasses.User;
-import onBoard.network.networkUtils.AuthToken;
+import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
-import onBoard.network.networkUtils.NetworkUtils;
-import onBoard.network.networkUtils.PortHandler;
-import onBoard.network.networkUtils.RequestToken;
+import onBoard.quizUtilities.Quiz;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -52,7 +50,11 @@ public class ClientHandler {
             serverSocket = new ServerSocket(signature);
 
             // connecting to server for authentication
-            NetworkUtils.sendRequest(new RequestToken("AUTH", authToken, signature), socket, signature);
+
+            if (NetworkGlobals.luckyMode) NetworkUtils.sendRequest(new RequestToken("AUTHLUCKY", authToken, signature), socket, signature);
+            else NetworkUtils.sendRequest(new RequestToken("AUTH", authToken, signature), socket, signature);
+
+
             receiveSocket = serverSocket.accept();
             RequestToken token = NetworkUtils.getObject(receiveSocket);
 
@@ -68,7 +70,6 @@ public class ClientHandler {
                 System.out.println("\uD83D\uDD13Authentication verified.\n\tUser email: " + response.email + "\n\tUser type: " + response.userType);
                 sendSocket = new Socket(PortHandler.serverAddress, (int) token.response);
                 System.out.println("✅Created a room socket (from server's room) with port address " + token.response);
-                socket.close();
             }
         } catch (IOException | ClassNotFoundException | InterruptedException e) {
             System.out.println("Error at ClientHandler constructor with error: " + e);
@@ -85,6 +86,10 @@ public class ClientHandler {
     }
 
 
+
+    /*
+    Gets user info.
+     */
     public User getUserInfo() throws Throwable {
         RequestToken requestToken = new RequestToken();
         requestToken.response = user;
@@ -100,6 +105,20 @@ public class ClientHandler {
 
         }  return user;
     }
+
+
+    public void closeSession () throws IOException {
+
+        NetworkUtils.sendRequest(new RequestToken("CLOSE" ,authToken, signature), sendSocket);
+    }
+
+    public void postQuiz(Quiz q){
+        RequestToken tkn = new RequestToken();
+        tkn.requestFor="POST";
+        tkn.authentication = authToken;
+    }
+
+
 
 
 

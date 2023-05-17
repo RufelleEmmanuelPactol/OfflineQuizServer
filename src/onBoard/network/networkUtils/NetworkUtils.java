@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class NetworkUtils {
+
     public static <T> T getObject(Socket socket) throws IOException, ClassNotFoundException, InterruptedException {
            // System.out.println("Accepting byte stream listening from port " + socket.getLocalPort());
             var inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -32,7 +33,7 @@ public class NetworkUtils {
 
     public static void waitForBufferInstance (DataInputStream stream) {
         try {
-            TimeUnit.MICROSECONDS.sleep(250);
+            TimeUnit.MILLISECONDS.sleep(250);
             while (stream.available() == 0) {
                 // delay
             }
@@ -47,7 +48,7 @@ public class NetworkUtils {
     public static void waitForBufferInstance (InputStream inputStream) {
         var stream = new DataInputStream(new BufferedInputStream(inputStream));
         try {
-            TimeUnit.MICROSECONDS.sleep(250);
+            TimeUnit.MICROSECONDS.sleep(100);
             while (stream.available() == 0) {
                 // delay
             }
