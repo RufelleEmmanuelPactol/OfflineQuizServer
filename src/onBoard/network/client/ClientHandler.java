@@ -4,6 +4,7 @@ import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.quizUtilities.Quiz;
 
+import javax.swing.*;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -112,10 +113,19 @@ public class ClientHandler {
         NetworkUtils.sendRequest(new RequestToken("CLOSE" ,authToken, signature), sendSocket);
     }
 
-    public void postQuiz(Quiz q){
+    public void postQuiz(Quiz q) throws IOException, ClassNotFoundException, InterruptedException {
         RequestToken tkn = new RequestToken();
-        tkn.requestFor="POST";
-        tkn.authentication = authToken;
+        tkn.requestFor="POSTQUIZ";
+        tkn.authentication = NetworkGlobals.currentClass;
+        tkn.response = q;
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        RequestToken response = NetworkUtils.getObject(receiveSocket);
+        if (response.exception == null )return;
+        Exception e = (Exception) response.exception;
+        NetworkGlobals.showMsg(e.toString());
+        e.printStackTrace();
+
+
     }
 
 

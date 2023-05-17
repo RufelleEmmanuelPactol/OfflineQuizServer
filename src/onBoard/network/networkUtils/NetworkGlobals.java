@@ -1,5 +1,6 @@
 package onBoard.network.networkUtils;
 
+import onBoard.dataClasses.ClassData;
 import onBoard.network.client.ClientHandler;
 import onBoard.network.exceptions.InvalidAuthException;
 
@@ -72,5 +73,5 @@ public class NetworkGlobals {
     ClassID status determining the
     current class instance.
     ================================ */
-    public static int classID;
+    public static ClassData currentClass = null;
 }

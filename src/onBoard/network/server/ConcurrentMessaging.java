@@ -2,6 +2,8 @@ package onBoard.network.server;
 
 import onBoard.connectivity.SQLConnector;
 import onBoard.connectivity.Serialize;
+import onBoard.dataClasses.ClassData;
+import onBoard.dataClasses.ClassUser;
 import onBoard.dataClasses.User;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.exceptions.InvalidRequestForHeader;
@@ -81,7 +83,15 @@ public class ConcurrentMessaging extends Thread {
             } else if (tkn.requestFor.equals("POSTQUIZ")){
                 var quiz = (Quiz)tkn.response;
                 System.out.println("There is a POST QUIZ request.");
-                NetworkUtils.sqlconnector().postQuiz(quiz, (User)tkn.authentication); // implement quiz
+                try {
+                    NetworkUtils.sqlconnector().postQuiz(quiz, (ClassData) tkn.authentication); // implement quiz
+                    NetworkUtils.sendRequest(new RequestToken(), sendingSocket);
+                } catch (Exception e){
+                    var req = new RequestToken();
+                    req.exception = e;
+                    NetworkUtils.sendRequest(req, sendingSocket);
+                }
+
             } else if (tkn.requestFor.equals("GETQUIZZES")){
 
             } else if (tkn.requestFor.equals("ADDCLASS")){

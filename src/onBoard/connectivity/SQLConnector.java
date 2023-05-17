@@ -1,5 +1,7 @@
 package onBoard.connectivity;
 
+import onBoard.dataClasses.ClassData;
+import onBoard.dataClasses.ClassUser;
 import onBoard.dataClasses.User;
 import onBoard.network.networkUtils.AuthToken;
 import onBoard.network.exceptions.InvalidAuthException;
@@ -51,10 +53,14 @@ public class SQLConnector {
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    public void postQuiz (Quiz quiz, User user) throws IOException, SQLException {
+    public void postQuiz (Quiz quiz, ClassData instance) throws IOException, SQLException {
         var quizByteStream = Serialize.writeToBytes(quiz);
-        var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob) values (null, ?)");
+        var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob, quiz_name, class_id, quiz_open, quiz_close) values (null, ?, ?, ?, ?, ?)");
         prepared.setBytes(1, quizByteStream);
+        prepared.setString(2, quiz.getQuizName());
+        prepared.setInt(3, instance.classId);
+        prepared.setString(4, quiz.getTimeOpen().toString());
+        prepared.setString(5, quiz.getTimeClose().toString());
         prepared.executeUpdate();
     }
 

@@ -1,9 +1,10 @@
 package onBoard.connectivity;
 
+import onBoard.dataClasses.ClassData;
+import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.PortHandler;
 import onBoard.quizUtilities.Quiz;
 import onBoard.quizUtilities.MultipleChoice.Choice;
-import onBoard.quizUtilities.Quiz;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -17,20 +18,21 @@ public class Main {
                 .addChoice("R").addChoice("B").addChoice("C").addChoice("D");
         System.out.println(myquiz.getQuestionNumber(1).checkAnswer(Choice.A));
         myquiz.log();
+        myquiz.setTimeOpen().setYear(2025).setDay(30).setMonth(12).setHour(12).setMinute(00);
+        myquiz.setTimeClose().setYear(2026).setDay(30).setMonth(12).setHour(12).setMinute(00);
+        System.out.println(myquiz.getTimeOpen());
         System.out.println("\n");
+        var cls = new ClassData();
+        cls.classId = 0;
+        NetworkGlobals.currentClass = cls;
         SQLConnector sqlc;
         try {
             sqlc = new SQLConnector();
-            // posts a quiz to the database
-            sqlc.postQuiz(myquiz);
-            Quiz newquiz = sqlc.getQuiz(2);
-            System.out.println(newquiz.getQuestionNumber(1).checkAnswer(Choice.A));
-            newquiz.log();
+            sqlc.postQuiz(myquiz, cls);
+
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        } catch (IOException e) {
+        }  catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

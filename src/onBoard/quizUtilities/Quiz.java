@@ -1,9 +1,9 @@
 package onBoard.quizUtilities;
 
+import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.MultipleChoice.MultipleAnswerQuestion;
 import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
 import onBoard.quizUtilities.MultipleChoice.Choice;
-import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -13,6 +13,8 @@ public class Quiz implements Serializable {
     protected String quizName;
     public int teacherID;
     public int classID;
+    private DateBuilder opens;
+    private DateBuilder closes;
 
 
 
@@ -107,5 +109,25 @@ public class Quiz implements Serializable {
         } return marks;
     }
 
+    public DateBuilder setTimeClose(){
+        this.closes = new DateBuilder();
+        return this.closes;
+    }
 
+    public String getQuizName() {
+        return quizName;
+    }
+
+    public DateBuilder setTimeOpen(){
+        this.opens = new DateBuilder();
+        return this.opens;
+    }
+
+    public DateBuilder getTimeOpen() {
+        return opens;
+    }
+
+    public DateBuilder getTimeClose() {
+        return closes;
+    }
 }
