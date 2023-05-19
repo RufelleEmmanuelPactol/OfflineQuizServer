@@ -22,6 +22,7 @@ public class Identification extends Question {
 
     @Override
     public boolean checkAnswer(Object ans) {
+        super.checkAnswer(ans);
         var answer = (String)ans;
         answer = transform(answer);
         var tempAnswer = transform(correctAnswer);
@@ -47,4 +48,6 @@ public class Identification extends Question {
         }
         return correctAnswer;
     }
+
+
 }
