@@ -9,7 +9,7 @@ public abstract class Question  implements Serializable {
         return isCorrect;
     }
 
-    protected String prompt;
+    public String prompt;
 
     public Question (String question)
     {
@@ -28,4 +28,5 @@ public abstract class Question  implements Serializable {
     public int getMarks() {
         return marks;
     }
+
 }

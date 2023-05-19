@@ -5,8 +5,17 @@ import java.util.List;
 
 public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
 
-    ArrayList<Choice> correctChoices;
+    protected ArrayList<Choice> correctChoices;
 
+    public ArrayList<Choice> getCorrectAnswers() {
+        return correctChoices;
+    }
+
+    @Override
+    public Choice getCorrectAnswer() {
+        System.err.println("Please do not use this method when invoking MultipleAnswerQuestion. Use getCorrectAnswers() instead.");
+        throw new RuntimeException();
+    }
 
     public MultipleAnswerQuestion(String question, int maxChoice, Choice[] answers) {
         super(question, maxChoice, null);

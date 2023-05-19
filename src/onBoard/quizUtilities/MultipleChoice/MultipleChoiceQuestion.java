@@ -10,6 +10,13 @@ public class MultipleChoiceQuestion extends Question {
     protected int maxChoice;
     private ArrayList<QuestionChoice> choices;
 
+    public Choice getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public int getMaxChoice() {
+        return maxChoice;
+    }
 
     public MultipleChoiceQuestion(String question, int maxChoice, Choice correctAnswer) {
         super(question);
