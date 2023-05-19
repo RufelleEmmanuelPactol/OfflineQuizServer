@@ -16,15 +16,15 @@ public class ConcurrentServerHandler {
     private Socket socket;
 
     public ConcurrentServerHandler() {
+        var stat = "OnBoard::";
         try (var serverSocket = new ServerSocket(PortHandler.requestPort())){
             while (true) {
                 /*
                 The constructor of the ConcurrentServerHandler is blocking
                 and continuously accepts new sockets.
                  */
-                System.out.println("The server is open and is awaiting for connections.");
+                System.out.println(stat+serverSocket.getLocalPort() + "> The server is open and is awaiting for connections.");
                 socket = serverSocket.accept();
-                System.out.println("✅Connected with port address " + serverSocket.getLocalPort());
 
                 /*
                 This area of the constructor asynchronously handles AUTH requests.
@@ -43,7 +43,7 @@ public class ConcurrentServerHandler {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
-                        System.out.println("There is a request for " + requestToken.requestFor);
+                      //  System.out.println("There is a request for " + requestToken.requestFor);
                         var message = new ConcurrentMessaging(requestToken);
                         message.start();
                     }

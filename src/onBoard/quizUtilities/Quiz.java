@@ -98,6 +98,10 @@ public class Quiz implements Serializable {
         } return marks;
     }
 
+    public int getQuestionCount (){
+        return questions.size();
+    }
+
     /*
     Returns the user's score.
      */
@@ -130,4 +134,6 @@ public class Quiz implements Serializable {
     public DateBuilder getTimeClose() {
         return closes;
     }
+
+    public ArrayList getQuestions () {return questions;}
 }

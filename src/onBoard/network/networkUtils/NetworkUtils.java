@@ -4,9 +4,11 @@ import onBoard.connectivity.SQLConnector;
 import onBoard.connectivity.Serialize;
 import onBoard.network.client.ClientHandler;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class NetworkUtils {
@@ -17,15 +19,14 @@ public class NetworkUtils {
             ArrayList<Byte> byteStreamBuffer = new ArrayList<>();
 
             // sleep to add time buffer to send bytes
-            waitForBufferInstance(inputStream);
+          waitForBufferInstance(inputStream);
+            Thread.sleep(1000);
 
             while (inputStream.available() != 0) byteStreamBuffer.add(inputStream.readByte());
             byte[] objectByte = new byte[byteStreamBuffer.size()];
             for (int i = 0; i < byteStreamBuffer.size(); i++)
                 objectByte[i] = byteStreamBuffer.get(i);
-            System.out.println("Attempting to construct an object from port " + socket.getLocalPort());
             var x = Serialize.constructFromBlob(objectByte);
-            System.out.println("✅Succeeded with constructing an object from port " + socket.getLocalPort());
             return (T) x;
 
     }
@@ -33,7 +34,6 @@ public class NetworkUtils {
 
     public static void waitForBufferInstance (DataInputStream stream) {
         try {
-            TimeUnit.MILLISECONDS.sleep(250);
             while (stream.available() == 0) {
                 // delay
             }
@@ -48,9 +48,10 @@ public class NetworkUtils {
     public static void waitForBufferInstance (InputStream inputStream) {
         var stream = new DataInputStream(new BufferedInputStream(inputStream));
         try {
-            TimeUnit.MICROSECONDS.sleep(100);
+
             while (stream.available() == 0) {
                 // delay
+                waitForBufferInstance(stream);
             }
         } catch (EOFException e){
             waitForBufferInstance(stream);
@@ -101,6 +102,26 @@ public class NetworkUtils {
             throw e;
         }
     }
+
+    public static void showNotif(String title, String body) throws AWTException {
+        //Obtain only one instance of the SystemTray object
+        SystemTray tray = SystemTray.getSystemTray();
+
+        //If the icon is a file
+        Image image = Toolkit.getDefaultToolkit().createImage("icon.png");
+        //Alternative (if the icon is on the classpath):
+        //Image image = Toolkit.getDefaultToolkit().createImage(getClass().getResource("icon.png"));
+
+        TrayIcon trayIcon = new TrayIcon(image, "Tray Demo");
+        //Let the system resize the image if needed
+        trayIcon.setImageAutoSize(true);
+        //Set tooltip text for the tray icon
+        trayIcon.setToolTip("System tray icon demo");
+        tray.add(trayIcon);
+
+        trayIcon.displayMessage(title, body, TrayIcon.MessageType.INFO);
+    }
+
 
 }
 

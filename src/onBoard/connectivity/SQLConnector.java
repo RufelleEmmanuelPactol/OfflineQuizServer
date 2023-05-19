@@ -3,12 +3,11 @@ package onBoard.connectivity;
 import onBoard.dataClasses.ClassData;
 import onBoard.dataClasses.ClassUser;
 import onBoard.dataClasses.User;
-import onBoard.network.networkUtils.AuthToken;
+import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
-import onBoard.network.networkUtils.NetworkGlobals;
-import onBoard.network.networkUtils.PortHandler;
-import onBoard.network.networkUtils.RequestToken;
 import onBoard.quizUtilities.Quiz;
+
+import java.awt.*;
 import java.util.Date;
 import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.*;
@@ -24,6 +23,8 @@ import java.time.chrono.ChronoLocalDateTime;
 public class SQLConnector {
     private static String lucky_creds = "user_for_school";
     private static String user = "root";
+    Connection connection;
+    Statement statement;
     public static boolean checkConnection(){
 
         if (NetworkGlobals.luckyMode) {
@@ -32,15 +33,22 @@ public class SQLConnector {
         }
 
         try {
-          var  connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, "");
-          var  statement = connection.createStatement();
+            //         connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306", "root", "");
+            var connection = DriverManager.getConnection("jdbc:mysql://localhost:3306", user, "");
+            var statement = connection.createStatement();
             statement.executeUpdate("USE dbonboard");
+            return true;
         } catch (SQLException e) {
-            return false;
-        } return true;
+            System.out.println(e);
+            try {
+                NetworkUtils.showNotif("Your SQL server is off.", "To make sure that the OnBoard server is working properly, please turn on your SQL server.");
+                return false;
+            } catch (AWTException r){
+                System.err.println(r);
+                return false;
+            }
+        }
     }
-    Connection connection;
-    Statement statement;
 
     public SQLConnector() {
         try {
@@ -50,9 +58,13 @@ public class SQLConnector {
             statement.executeUpdate("USE dbonboard");
         } catch (SQLException e) {
             System.out.println(e);
-            JOptionPane.showMessageDialog(null, e);
+            try {
+                NetworkUtils.showNotif("Your SQL server is off.", "To make sure that the OnBoard server is working properly, please turn on your SQL server.");
+            } catch (AWTException r){}
         }
     }
+
+
     public void postQuiz (Quiz quiz, ClassData instance) throws IOException, SQLException {
         var quizByteStream = Serialize.writeToBytes(quiz);
         var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob, quiz_name, class_id, quiz_open, quiz_close) values (null, ?, ?, ?, ?, ?)");

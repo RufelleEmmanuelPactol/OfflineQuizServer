@@ -6,9 +6,15 @@ import onBoard.quizUtilities.Quiz;
 
 import javax.swing.*;
 import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
+import java.util.Vector;
 
+/*=========================================
+  =========================================*/
 public class ClientHandler {
     protected ServerSocket serverSocket;
     protected Socket socket;
@@ -41,7 +47,6 @@ public class ClientHandler {
 
     public ClientHandler(String username, String password) throws IOException, ClassNotFoundException, InterruptedException {
         try {
-
             // init components
             socket = PortHandler.generateSocket();
             System.out.println("Connected with port address " + socket.getPort());
@@ -54,10 +59,11 @@ public class ClientHandler {
 
             if (NetworkGlobals.luckyMode) NetworkUtils.sendRequest(new RequestToken("AUTHLUCKY", authToken, signature), socket, signature);
             else NetworkUtils.sendRequest(new RequestToken("AUTH", authToken, signature), socket, signature);
-
-
             receiveSocket = serverSocket.accept();
             RequestToken token = NetworkUtils.getObject(receiveSocket);
+            if (token.exception instanceof ConnectException) {
+                throw new InterruptedException();
+            }
 
             // check if the response is good or not
             if (token.exception != null) {
@@ -81,16 +87,10 @@ public class ClientHandler {
 
     }
 
-    // Binds a session to this client
-    public void bindSession(String sessionID) {
-        authToken.sessionID = sessionID;
-    }
-
-
-
-    /*
-    Gets user info.
-     */
+    /*=========================================
+    Gets the user information from the server.
+    Returns a User() class.
+    =========================================*/
     public User getUserInfo() throws Throwable {
         RequestToken requestToken = new RequestToken();
         requestToken.response = user;
@@ -108,10 +108,22 @@ public class ClientHandler {
     }
 
 
+    /*=========================================
+    Requests the server to terminate the socket.
+    This clears up the resources and allocates
+    them for other clients.
+    =========================================*/
     public void closeSession () throws IOException {
-
+        serverSocket.close();
+        receiveSocket.close();
         NetworkUtils.sendRequest(new RequestToken("CLOSE" ,authToken, signature), sendSocket);
     }
+
+    /*=========================================
+    Posts a quiz to the database via the server.
+    Requirements: currentClass must be initialized.
+    To initialize, go to NetworkGlobals.currentClass
+    =========================================*/
 
     public void postQuiz(Quiz q) throws IOException, ClassNotFoundException, InterruptedException {
         RequestToken tkn = new RequestToken();

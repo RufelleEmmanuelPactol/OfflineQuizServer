@@ -22,6 +22,7 @@ public class ConcurrentMessaging extends Thread {
     RequestToken requestToken;
     private boolean close = false;
     ServerSocket roomSocket;
+    private static String stat = "OnBoard::";
 
 
     public ConcurrentMessaging (RequestToken requestToken)  {
@@ -29,7 +30,6 @@ public class ConcurrentMessaging extends Thread {
 
         // special use case for lucky
         if (requestToken.requestFor.equals("AUTHLUCKY")) NetworkGlobals.luckyMode = true;
-        else System.out.println(requestToken.requestFor);
     }
 
     public void close (boolean close) {this.close = close;}
@@ -39,15 +39,17 @@ public class ConcurrentMessaging extends Thread {
 
 
         sendingSocket = new Socket(PortHandler.serverAddress, requestToken.signature);
-        // check for SQL Database Connectivity
-        SQLConnector.checkConnection();
+        if (!SQLConnector.checkConnection()) {
+            requestToken.exception = new ConnectException();
+            NetworkUtils.sendRequest(requestToken, sendingSocket);
+        }
 
-           System.out.println("\uD83D\uDD12Sending AUTH acceptance with room signature " + (requestToken.signature));
+           System.out.println(stat + sendingSocket.getLocalPort() + "> Sending AUTH acceptance with room signature " + (requestToken.signature));
             NetworkUtils.sqlconnector().verifyUser(requestToken);
         if(requestToken.exception == null) {
-            System.out.println("\uD83D\uDD13Server Verified Account with username: " + ((AuthToken) requestToken.authentication).email);
-            System.out.println("Created a new ServerSocket room with port " + (int) requestToken.response);
+            System.out.println(stat + sendingSocket.getLocalPort() +"> Server Verified Account with username: " + ((AuthToken) requestToken.authentication).email);
             roomSocket = new ServerSocket((int) requestToken.response);
+            System.out.println(stat + roomSocket.getLocalPort() +"> Created a new ServerSocket room with port " + (int) requestToken.response);
         }
         
         sendingSocket.getOutputStream().write(Serialize.writeToBytes(requestToken));
@@ -66,23 +68,23 @@ public class ConcurrentMessaging extends Thread {
 
     void attendToRequests() throws IOException, ClassNotFoundException, InterruptedException, SQLException {
         receivingSocket = roomSocket.accept();
-        System.out.println("Accepted client's socket with room " + roomSocket.getLocalPort());
+        System.out.println(stat + roomSocket.getLocalPort() + "> Accepted client's socket with room " + roomSocket.getLocalPort());
         while (sendingSocket.isConnected() && !close) {
             RequestToken tkn = NetworkUtils.getObject(receivingSocket);
             if (tkn.requestFor.equals("USERINFO")) {
-                System.out.println("There is a USERINFO request");
+                System.out.println(stat + roomSocket.getLocalPort()  + "> There is a USERINFO request");
                 User user = NetworkUtils.sqlconnector().getUserData(tkn);
                 if (user == null) {
                     tkn.exception = new InvalidAuthException();
                 }
                 tkn.response = user;
-                System.out.println("While handling requests, we sent a message to port " + sendingSocket.getPort());
+                System.out.println(stat + roomSocket.getLocalPort() + "> While handling requests, we sent a message to port " + sendingSocket.getPort());
                 NetworkUtils.sendRequest(tkn, sendingSocket);
             } else if (tkn.requestFor.equals("CLOSE")) {
                 break;
             } else if (tkn.requestFor.equals("POSTQUIZ")){
                 var quiz = (Quiz)tkn.response;
-                System.out.println("There is a POST QUIZ request.");
+                System.out.println(stat + roomSocket.getLocalPort() + "> There is a POST QUIZ request.");
                 try {
                     NetworkUtils.sqlconnector().postQuiz(quiz, (ClassData) tkn.authentication); // implement quiz
                     NetworkUtils.sendRequest(new RequestToken(), sendingSocket);
@@ -100,11 +102,13 @@ public class ConcurrentMessaging extends Thread {
 
             }
             else {
-                System.out.println("Invalid request made with requestFor header: " + tkn.requestFor);
+                System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
                 tkn.exception = new InvalidRequestForHeader();
             }
-        }  if (sendingSocket.isClosed()) sendingSocket.close();
-        System.out.println("Socket " + receivingSocket.getLocalPort() + " has been closed.");
+        }  sendingSocket.close();
+        receivingSocket.close();
+        roomSocket.close();
+        System.out.println(stat + roomSocket.getLocalPort() + "> Socket " + receivingSocket.getLocalPort() + " has been closed.");
 
 
     }

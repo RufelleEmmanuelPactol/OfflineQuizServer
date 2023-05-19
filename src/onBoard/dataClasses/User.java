@@ -10,6 +10,7 @@ public class User implements Serializable {
     public String lastname;
     public String email;
     public int userType;
+    public String organization;
 
     public User(int userId, String firstname, String lastname, String email, String organization, int userType) {
         this.userId = userId;
@@ -17,5 +18,7 @@ public class User implements Serializable {
         this.lastname = lastname;
         this.email = email;
         this.userType = userType;
+        this.organization = organization;
+
     }
 }

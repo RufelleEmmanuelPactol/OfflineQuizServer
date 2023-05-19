@@ -18,6 +18,8 @@ public class Main {
                 .addChoice("R").addChoice("B").addChoice("C").addChoice("D");
         System.out.println(myquiz.getQuestionNumber(1).checkAnswer(Choice.A));
         myquiz.log();
+
+        myquiz.addMultipleAnswerQuestion("Question", 3, new Choice[]{Choice.A, Choice.B});
         myquiz.setTimeOpen().setYear(2025).setDay(30).setMonth(12).setHour(12).setMinute(00);
         myquiz.setTimeClose().setYear(2026).setDay(30).setMonth(12).setHour(12).setMinute(00);
         System.out.println(myquiz.getTimeOpen());
