@@ -91,7 +91,7 @@ public class Quiz implements Serializable {
     /*
     Returns the highest possible score.
      */
-    public int getTotalMarks(){
+    public double getTotalMarks(){
         int marks = 0;
         for (var i : questions){
             marks+=i.getMarks();
@@ -105,11 +105,10 @@ public class Quiz implements Serializable {
     /*
     Returns the user's score.
      */
-    public int getMarks(){
-        int marks = 0;
+    public double getMarks(){
+        double marks = 0;
         for (var i : questions){
-            if (i.isCorrect())
-            marks+=i.getMarks();
+            marks = i.getAwardedMarks();
         } return marks;
     }
 
