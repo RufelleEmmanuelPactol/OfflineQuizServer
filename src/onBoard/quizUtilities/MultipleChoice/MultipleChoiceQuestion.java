@@ -18,6 +18,10 @@ public class MultipleChoiceQuestion extends Question {
         this.correctAnswer = correctAnswer;
     }
 
+    public ArrayList<QuestionChoice> getChoices() {
+        return choices;
+    }
+
     @Override
     public boolean checkAnswer (Object ans) {
         var attempt = (Choice)ans;

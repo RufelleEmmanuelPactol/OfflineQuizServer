@@ -10,6 +10,7 @@ import onBoard.network.exceptions.InvalidRequestForHeader;
 import onBoard.network.networkUtils.*;
 import onBoard.quizUtilities.Quiz;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
@@ -67,49 +68,52 @@ public class ConcurrentMessaging extends Thread {
 
 
     void attendToRequests() throws IOException, ClassNotFoundException, InterruptedException, SQLException {
-        receivingSocket = roomSocket.accept();
-        System.out.println(stat + roomSocket.getLocalPort() + "> Accepted client's socket with room " + roomSocket.getLocalPort());
-        while (sendingSocket.isConnected() && !close) {
-            RequestToken tkn = NetworkUtils.getObject(receivingSocket);
-            if (tkn.requestFor.equals("USERINFO")) {
-                System.out.println(stat + roomSocket.getLocalPort()  + "> There is a USERINFO request");
-                User user = NetworkUtils.sqlconnector().getUserData(tkn);
-                if (user == null) {
-                    tkn.exception = new InvalidAuthException();
+        try {
+            receivingSocket = roomSocket.accept();
+            System.out.println(stat + roomSocket.getLocalPort() + "> Accepted client's socket with room " + roomSocket.getLocalPort());
+            while (sendingSocket.isConnected() && !close) {
+                RequestToken tkn = NetworkUtils.getObject(receivingSocket);
+                if (tkn.requestFor.equals("USERINFO")) {
+                    System.out.println(stat + roomSocket.getLocalPort() + "> There is a USERINFO request");
+                    User user = NetworkUtils.sqlconnector().getUserData(tkn);
+                    if (user == null) {
+                        tkn.exception = new InvalidAuthException();
+                    }
+                    tkn.response = user;
+                    System.out.println(stat + roomSocket.getLocalPort() + "> While handling requests, we sent a message to port " + sendingSocket.getPort());
+                    NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("CLOSE")) {
+                    break;
+                } else if (tkn.requestFor.equals("POSTQUIZ")) {
+                    var quiz = (Quiz) tkn.response;
+                    System.out.println(stat + roomSocket.getLocalPort() + "> There is a POST QUIZ request.");
+                    try {
+                        NetworkUtils.sqlconnector().postQuiz(quiz, (ClassData) tkn.authentication); // implement quiz
+                        NetworkUtils.sendRequest(new RequestToken(), sendingSocket);
+                    } catch (Exception e) {
+                        var req = new RequestToken();
+                        req.exception = e;
+                        NetworkUtils.sendRequest(req, sendingSocket);
+                    }
+
+                } else if (tkn.requestFor.equals("GETQUIZZES")) {
+
+                } else if (tkn.requestFor.equals("ADDCLASS")) {
+
+                } else if (tkn.requestFor.equals("POSTATTEMPT")) {
+
+                } else {
+                    System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
+                    tkn.exception = new InvalidRequestForHeader();
                 }
-                tkn.response = user;
-                System.out.println(stat + roomSocket.getLocalPort() + "> While handling requests, we sent a message to port " + sendingSocket.getPort());
-                NetworkUtils.sendRequest(tkn, sendingSocket);
-            } else if (tkn.requestFor.equals("CLOSE")) {
-                break;
-            } else if (tkn.requestFor.equals("POSTQUIZ")){
-                var quiz = (Quiz)tkn.response;
-                System.out.println(stat + roomSocket.getLocalPort() + "> There is a POST QUIZ request.");
-                try {
-                    NetworkUtils.sqlconnector().postQuiz(quiz, (ClassData) tkn.authentication); // implement quiz
-                    NetworkUtils.sendRequest(new RequestToken(), sendingSocket);
-                } catch (Exception e){
-                    var req = new RequestToken();
-                    req.exception = e;
-                    NetworkUtils.sendRequest(req, sendingSocket);
-                }
-
-            } else if (tkn.requestFor.equals("GETQUIZZES")){
-
-            } else if (tkn.requestFor.equals("ADDCLASS")){
-
-            } else if (tkn.requestFor.equals("POSTATTEMPT")){
-
             }
-            else {
-                System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
-                tkn.exception = new InvalidRequestForHeader();
-            }
-        }  sendingSocket.close();
-        receivingSocket.close();
-        roomSocket.close();
-        System.out.println(stat + roomSocket.getLocalPort() + "> Socket " + receivingSocket.getLocalPort() + " has been closed.");
-
+            sendingSocket.close();
+            receivingSocket.close();
+            roomSocket.close();
+            System.out.println(stat + roomSocket.getLocalPort() + "> Socket " + receivingSocket.getLocalPort() + " has been closed.");
+        } catch (EOFException e){
+            System.out.println(stat + roomSocket.getLocalPort() + "> Socket " + receivingSocket.getLocalPort() + " has been closed.");
+        }
 
     }
 
