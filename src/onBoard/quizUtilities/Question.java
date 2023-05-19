@@ -37,6 +37,11 @@ public abstract class Question  implements Serializable {
         return this;
     }
 
+    // clears attempt
+    public void clearAttempt(){
+        attempt = null;
+    }
+
     public double getMarks() {
         return marks;
     }

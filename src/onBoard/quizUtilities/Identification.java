@@ -22,7 +22,7 @@ public class Identification extends Question {
 
     @Override
     public boolean checkAnswer(Object ans) {
-        super.checkAnswer(ans);
+        if (ans==null) return false;
         var answer = (String)ans;
         answer = transform(answer);
         var tempAnswer = transform(correctAnswer);

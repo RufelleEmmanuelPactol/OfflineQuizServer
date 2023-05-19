@@ -54,9 +54,14 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
         int maxCounter = correctChoices.size();
         double score = 0;
         for (var i : attempts){
+            if (i==null) continue;
             if (correctChoices.contains(i)){
                 score += (marks/maxCounter);
             } else score -= (marks/maxCounter);
         } return score;
+    }
+
+    public void clearAttempts(){
+        attempts.clear();
     }
 }
