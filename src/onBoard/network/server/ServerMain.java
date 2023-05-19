@@ -1,7 +1,6 @@
 package onBoard.network.server;
 
 import onBoard.connectivity.SQLConnector;
-import onBoard.network.networkUtils.NetworkGlobals;
 
 import java.sql.SQLException;
 
@@ -41,6 +40,5 @@ public class ServerMain {
                 "                                               \n" +
                 "                              ";
         System.out.println(server);
-        System.out.println("v.0.2.1");
     }
 }

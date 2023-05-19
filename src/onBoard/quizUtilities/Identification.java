@@ -5,10 +5,6 @@ public class Identification extends Question {
     protected boolean whitespaceInsensitive = false;
     protected String correctAnswer;
 
-    public String getCorrectAnswer(){
-        return correctAnswer;
-    }
-
     public Identification(String question, String correctAnswer) {
         super(question);
         this.correctAnswer = correctAnswer;
