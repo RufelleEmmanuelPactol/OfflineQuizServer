@@ -1,6 +1,7 @@
 package onBoard.network.utils;
 
 import onBoard.network.exceptions.DateTimeFormatException;
+import onBoard.network.networkUtils.NetworkGlobals;
 
 import java.io.Serializable;
 
@@ -46,4 +47,5 @@ public class DateBuilder implements Serializable {
         if (year == 0 || month == 0 || day == 0) throw new DateTimeFormatException();
         return year+"/"+month+"/"+day+" " + hour+":"+minute+":00";
     }
+
 }

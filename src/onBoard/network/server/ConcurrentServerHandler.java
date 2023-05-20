@@ -18,12 +18,12 @@ public class ConcurrentServerHandler {
     public ConcurrentServerHandler() {
         var stat = "OnBoard::";
         try (var serverSocket = new ServerSocket(PortHandler.requestPort())){
+            System.out.println(stat+serverSocket.getLocalPort() + "> The server is open and is awaiting for connections in port " + serverSocket.getLocalPort());
             while (true) {
                 /*
                 The constructor of the ConcurrentServerHandler is blocking
                 and continuously accepts new sockets.
                  */
-                System.out.println(stat+serverSocket.getLocalPort() + "> The server is open and is awaiting for connections.");
                 socket = serverSocket.accept();
 
                 /*

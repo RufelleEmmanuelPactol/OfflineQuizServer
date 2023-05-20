@@ -5,6 +5,8 @@ import onBoard.dataClasses.ClassData;
 import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.NetworkUtils;
 import onBoard.quizUtilities.MultipleChoice.Choice;
+import onBoard.quizUtilities.MultipleChoice.MultipleAnswerQuestion;
+import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
 import onBoard.quizUtilities.Quiz;
 
 import java.io.IOException;
@@ -17,6 +19,7 @@ public class ClientMain {
             public void run() {
                 try {
                     NetworkGlobals.createSession("jtulin@gmail.com", "jtulin");
+                    System.out.println(NetworkGlobals.getCurrentUser().userId);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {
@@ -40,13 +43,8 @@ public class ClientMain {
        Quiz setup: ensure that the setTimeClose and setTimeOpen
        is properly invoked to avoid server-side exceptions.
         */
-                Quiz q = new Quiz("Ego");
-                q.getQuestionNumber(1);
 
-                q.setTimeOpen().setYear(2000).setMonth(1).setDay(2);
-                q.setTimeClose().setYear(2000).setMonth(1).setDay(2);
 
-                // The proper postquiz method
                 try {
                    // NetworkGlobals.session().postQuiz(q);
                     SQLConnector n = new SQLConnector();

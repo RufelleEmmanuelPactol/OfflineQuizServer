@@ -48,6 +48,7 @@ public class ConcurrentMessaging extends Thread {
            System.out.println(stat + sendingSocket.getLocalPort() + "> Sending AUTH acceptance with room signature " + (requestToken.signature));
             NetworkUtils.sqlconnector().verifyUser(requestToken);
         if(requestToken.exception == null) {
+
             System.out.println(stat + sendingSocket.getLocalPort() +"> Server Verified Account with username: " + ((AuthToken) requestToken.authentication).email);
             roomSocket = new ServerSocket((int) requestToken.response);
             System.out.println(stat + roomSocket.getLocalPort() +"> Created a new ServerSocket room with port " + (int) requestToken.response);

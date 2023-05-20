@@ -3,6 +3,7 @@ package onBoard.connectivity;
 import onBoard.dataClasses.ClassData;
 import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.PortHandler;
+import onBoard.quizUtilities.MultipleChoice.MultipleAnswerQuestion;
 import onBoard.quizUtilities.Quiz;
 import onBoard.quizUtilities.MultipleChoice.Choice;
 
@@ -12,24 +13,12 @@ import java.sql.SQLException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        Socket socket = new Socket(PortHandler.serverAddress, 3306);
-        Quiz myquiz = new Quiz("Pabs");
-        myquiz.addMultipleChoiceQuestion("Who is a?", 4, Choice.A)
-                .addChoice("R").addChoice("B").addChoice("C").addChoice("D");
-        System.out.println(myquiz.getQuestionNumber(1).checkAnswer(Choice.A));
-        myquiz.log();
-
-        myquiz.addMultipleAnswerQuestion("Question", 3, new Choice[]{Choice.A, Choice.B});
-        myquiz.setTimeOpen().setYear(2025).setDay(30).setMonth(12).setHour(12).setMinute(00);
-        myquiz.setTimeClose().setYear(2026).setDay(30).setMonth(12).setHour(12).setMinute(00);
-        System.out.println(myquiz.getTimeOpen());
-        System.out.println("\n");
-        var cls = new ClassData();
-        cls.classId = 0;
-        NetworkGlobals.currentClass = cls;
-        SQLConnector sqlc;
-            sqlc = new SQLConnector();
-            sqlc.postQuiz(myquiz, cls);
+        Quiz q = new Quiz("Ego");
+        var question = (MultipleAnswerQuestion)q.addMultipleAnswerQuestion("What is your name?", 3, new Choice[]{Choice.A, Choice.B}).addChoice("Rufelle").addChoice("Marion").addChoice("Tulin").setMarks(10);
+        question.checkAnswer(Choice.B);
+        System.out.println("Awarded Marks: " + question.getAwardedMarks());
+        q.setTimeOpen().setYear(2000).setMonth(1).setDay(2);
+        q.setTimeClose().setYear(2000).setMonth(1).setDay(2);
 
     }
 }

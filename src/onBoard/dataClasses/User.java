@@ -21,4 +21,8 @@ public class User implements Serializable {
         this.organization = organization;
 
     }
+
+    public User() {
+
+    }
 }

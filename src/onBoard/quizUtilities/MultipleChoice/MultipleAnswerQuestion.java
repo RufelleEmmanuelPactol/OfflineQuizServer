@@ -58,7 +58,7 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
             if (correctChoices.contains(i)){
                 score += (marks/maxCounter);
             } else score -= (marks/maxCounter);
-        } return score;
+        } return score > 0 ? score : 0;
     }
 
     public void clearAttempts(){

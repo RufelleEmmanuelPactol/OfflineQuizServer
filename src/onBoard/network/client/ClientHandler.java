@@ -1,7 +1,10 @@
 package onBoard.network.client;
+import onBoard.connectivity.SQLConnector;
+import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
+import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.Quiz;
 
 import javax.swing.*;
@@ -77,11 +80,14 @@ public class ClientHandler {
                 System.out.println("\uD83D\uDD13Authentication verified.\n\tUser email: " + response.email + "\n\tUser type: " + response.userType);
                 sendSocket = new Socket(PortHandler.serverAddress, (int) token.response);
                 System.out.println("✅Created a room socket (from server's room) with port address " + token.response);
+                getUserInfo();
             }
         } catch (IOException | ClassNotFoundException | InterruptedException e) {
             System.out.println("Error at ClientHandler constructor with error: " + e);
             System.out.println("Error binding to port " + PortHandler.requestPort());
             throw e;
+        } catch (Throwable e) {
+            throw new RuntimeException(e);
         }
 
 
@@ -91,6 +97,7 @@ public class ClientHandler {
     Gets the user information from the server.
     Returns a User() class.
     =========================================*/
+
     public User getUserInfo() throws Throwable {
         RequestToken requestToken = new RequestToken();
         requestToken.response = user;
@@ -139,6 +146,16 @@ public class ClientHandler {
         e.printStackTrace();
     }
 
+    public void postAttempt(Quiz quiz, DateBuilder timeStarted){
+        Result result = new Result();
+        result.quizID = quiz.quizID;
+        result.endTime = NetworkGlobals.getTimeNow();
+        result.quizBlob = quiz;
+        result.startTime = timeStarted;
+        result.studentID = NetworkGlobals.session().getUser().userId;
+
+
+    }
 
 
 

@@ -51,7 +51,6 @@ public class NetworkUtils {
 
             while (stream.available() == 0) {
                 // delay
-                waitForBufferInstance(stream);
             }
         } catch (EOFException e){
             waitForBufferInstance(stream);

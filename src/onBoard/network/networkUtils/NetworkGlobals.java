@@ -1,6 +1,7 @@
 package onBoard.network.networkUtils;
 
 import onBoard.dataClasses.ClassData;
+import onBoard.dataClasses.User;
 import onBoard.network.client.ClientHandler;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.utils.DateBuilder;
@@ -89,5 +90,9 @@ public class NetworkGlobals {
         DateBuilder builder = new DateBuilder().setYear(time.getYear()).setMonth(time.getMonthValue())
                 .setDay(time.getDayOfMonth()).setHour(time.getHour()).setMinute(time.getMinute());
         return builder;
+    }
+
+    public static User getCurrentUser(){
+        return session().getUser();
     }
 }

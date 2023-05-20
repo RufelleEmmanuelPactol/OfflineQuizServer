@@ -10,15 +10,12 @@ import onBoard.quizUtilities.Quiz;
 
 import java.awt.*;
 import java.io.Serializable;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.Date;
 import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.*;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.DateFormat;
 import java.time.chrono.ChronoLocalDate;
 import java.time.chrono.ChronoLocalDateTime;
@@ -142,8 +139,14 @@ public class SQLConnector {
         , set.getString("lastname"), set.getString("email"), set.getString("organization_name"), set.getInt("is_proctor"));
     }
 
-    public void postAttempt (Quiz q){
-        Result result = new Result();
+    public void postAttempt (Result result) throws SQLException, IOException {
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO result values (null, ?, ?, ?, ?, ?)");
+        statement.setInt(1, result.studentID);
+        statement.setInt(2, result.quizID);
+        statement.setString(3, result.startTime.toString());
+        statement.setString(4, result.endTime.toString());
+        statement.setBytes(5, Serialize.writeToBytes(result.quizBlob));
+        statement.executeUpdate();
     }
 
 }
