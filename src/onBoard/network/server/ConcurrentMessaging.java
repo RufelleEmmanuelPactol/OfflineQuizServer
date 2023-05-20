@@ -4,6 +4,7 @@ import onBoard.connectivity.SQLConnector;
 import onBoard.connectivity.Serialize;
 import onBoard.dataClasses.ClassData;
 import onBoard.dataClasses.ClassUser;
+import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.exceptions.InvalidRequestForHeader;
@@ -102,7 +103,8 @@ public class ConcurrentMessaging extends Thread {
                 } else if (tkn.requestFor.equals("ADDCLASS")) {
 
                 } else if (tkn.requestFor.equals("POSTATTEMPT")) {
-
+                    var attempt = (Result)tkn.authentication;
+                    NetworkUtils.sqlconnector().postAttempt(attempt);
                 } else {
                     System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
                     tkn.exception = new InvalidRequestForHeader();

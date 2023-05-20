@@ -146,14 +146,17 @@ public class ClientHandler {
         e.printStackTrace();
     }
 
-    public void postAttempt(Quiz quiz, DateBuilder timeStarted){
+    public void postAttempt(Quiz quiz, DateBuilder timeStarted) throws IOException {
         Result result = new Result();
         result.quizID = quiz.quizID;
         result.endTime = NetworkGlobals.getTimeNow();
         result.quizBlob = quiz;
         result.startTime = timeStarted;
         result.studentID = NetworkGlobals.session().getUser().userId;
-
+        RequestToken requestToken = new RequestToken();
+        requestToken.authentication = result;
+        requestToken.requestFor = "POSTATTEMPT";
+        NetworkUtils.sendRequest(requestToken, sendSocket);
 
     }
 

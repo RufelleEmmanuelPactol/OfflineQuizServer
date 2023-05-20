@@ -51,14 +51,25 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
 
     @Override
     public double getAwardedMarks() {
-        int maxCounter = correctChoices.size();
-        double score = 0;
+        if (isPartialMarks)
+        {
+            int maxCounter = correctChoices.size();
+            double score = 0;
+            for (var i : attempts) {
+                if (i == null) continue;
+                if (correctChoices.contains(i)) {
+                    score += (marks / maxCounter);
+                } else score -= (marks / maxCounter);
+            }
+            return score > 0 ? score : 0;
+        }
+
+        boolean correctYet = false;
+
         for (var i : attempts){
-            if (i==null) continue;
-            if (correctChoices.contains(i)){
-                score += (marks/maxCounter);
-            } else score -= (marks/maxCounter);
-        } return score > 0 ? score : 0;
+            correctYet = correctChoices.contains(i) ? true : false;
+        } if (correctYet) return marks;
+        return 0;
     }
 
     public void clearAttempts(){

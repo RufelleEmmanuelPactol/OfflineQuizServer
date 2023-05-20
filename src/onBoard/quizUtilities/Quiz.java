@@ -118,6 +118,11 @@ public class Quiz implements Serializable {
         return this.closes;
     }
 
+    public void setTimeClose(DateBuilder builder){
+        closes = builder;
+    }
+
+
     public String getQuizName() {
         return quizName;
     }
@@ -125,6 +130,10 @@ public class Quiz implements Serializable {
     public DateBuilder setTimeOpen(){
         this.opens = new DateBuilder();
         return this.opens;
+    }
+
+    public void setTimeOpen(DateBuilder builder){
+        opens = builder;
     }
 
     public DateBuilder getTimeOpen() {

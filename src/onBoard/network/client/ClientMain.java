@@ -19,7 +19,6 @@ public class ClientMain {
             public void run() {
                 try {
                     NetworkGlobals.createSession("jtulin@gmail.com", "jtulin");
-                    System.out.println(NetworkGlobals.getCurrentUser().userId);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {
@@ -28,33 +27,25 @@ public class ClientMain {
                     throw new RuntimeException(e);
                 }
 
-       /*
-       This block is for debugging purposes only.
-       The proper implementation will be conducted
-       only after the implementation of the quiz area
-       is finished.
-        */
-                NetworkGlobals.currentClass = new ClassData();
-                NetworkGlobals.currentClass.classId = 0;
 
-
-
-       /*
-       Quiz setup: ensure that the setTimeClose and setTimeOpen
-       is properly invoked to avoid server-side exceptions.
-        */
 
 
                 try {
-                   // NetworkGlobals.session().postQuiz(q);
-                    SQLConnector n = new SQLConnector();
-                    var quiz = n.getQuiz(237);
-                    System.out.println(quiz.quizID);
+                   Quiz quiz = new Quiz("Junit");
+                   quiz.addIdentificationQuestion("Kinsay gapatay ni Rizal?", "Lapu-Lapu").setCaseInsensitive(true).setWhitespaceInsensitive(true);
+                   quiz.addMultipleChoiceQuestion("Kinsa siya?", 2, Choice.A).addChoice("True").addChoice("False");
+                   quiz.addMultipleAnswerQuestion("Ngano?", 2, new Choice[]{Choice.B}).addChoice("True").addChoice("False");
+                   quiz.setTimeClose(NetworkGlobals.getTimeNow());
+                   quiz.setTimeOpen(NetworkGlobals.getTimeNow());
+                   NetworkGlobals.currentClass = new ClassData();
+                   NetworkGlobals.currentClass.classId = 0;
+                   NetworkGlobals.session().postQuiz(quiz);
+                   NetworkGlobals.session();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
-                }  catch (SQLException e) {
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
                 try {
