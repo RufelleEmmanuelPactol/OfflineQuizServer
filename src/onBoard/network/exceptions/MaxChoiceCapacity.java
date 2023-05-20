@@ -1,4 +1,4 @@
-package onBoard.quizUtilities.MultipleChoice.Exceptions;
+package onBoard.network.exceptions;
 
 public class MaxChoiceCapacity extends RuntimeException {
     private int max;

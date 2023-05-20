@@ -16,6 +16,7 @@ public class Quiz implements Serializable {
     public int classID;
     private DateBuilder opens;
     private DateBuilder closes;
+    public boolean isAttempted = false;
 
 
 
@@ -86,6 +87,7 @@ public class Quiz implements Serializable {
         for (int i=0; i<questions.size(); i++){
             System.out.println("Question " + (i+1) + ": ");
             questions.get(i).log();
+            System.out.println("Attempt was: " + questions.get(i).attempt);
         }
     }
 

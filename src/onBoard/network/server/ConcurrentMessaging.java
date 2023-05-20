@@ -3,9 +3,9 @@ package onBoard.network.server;
 import onBoard.connectivity.SQLConnector;
 import onBoard.connectivity.Serialize;
 import onBoard.dataClasses.ClassData;
-import onBoard.dataClasses.ClassUser;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
+import onBoard.network.exceptions.CannotReattemptQuizAgain;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.exceptions.InvalidRequestForHeader;
 import onBoard.network.networkUtils.*;
@@ -103,9 +103,37 @@ public class ConcurrentMessaging extends Thread {
                 } else if (tkn.requestFor.equals("ADDCLASS")) {
 
                 } else if (tkn.requestFor.equals("POSTATTEMPT")) {
+                    System.out.println(stat + "> There is a request to POST ATTEMPT");
                     var attempt = (Result)tkn.authentication;
-                    NetworkUtils.sqlconnector().postAttempt(attempt);
-                } else {
+                    attempt.quizBlob.isAttempted = true;
+                    try {
+                        NetworkUtils.sqlconnector().postAttempt(attempt);
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
+                    } catch (CannotReattemptQuizAgain e){
+                        tkn.exception = e;
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
+
+                    }
+                } else if (tkn.requestFor.equals("GETQUIZ")) {
+                    try {
+                        System.out.println(stat + "> THERE is a request to get QUIZ");
+                        var id = (int) tkn.authentication;
+                        var quiz = NetworkUtils.sqlconnector().getQuiz(id);
+                        tkn.response = quiz;
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
+                    } catch (Exception e){
+                        tkn.exception = e;
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
+                    }
+                } else if (tkn.requestFor.equals("GETATTEMPT")){
+                    System.out.println(stat + "> THERE is a request to get GET ATTEMPT");
+                    var id = (int)tkn.authentication;
+                    var quizID = tkn.signature;
+                    var result = NetworkUtils.sqlconnector().getAttempt(quizID, id);
+                    tkn.response = result;
+                    NetworkUtils.sendRequest(tkn, sendingSocket);
+                }
+                else {
                     System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
                     tkn.exception = new InvalidRequestForHeader();
                 }

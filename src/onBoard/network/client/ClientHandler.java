@@ -1,20 +1,17 @@
 package onBoard.network.client;
-import onBoard.connectivity.SQLConnector;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
+import onBoard.network.exceptions.CannotReattemptQuizAgain;
+import onBoard.network.exceptions.TimeSubmissionElapsedException;
 import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.Quiz;
 
-import javax.swing.*;
 import java.io.IOException;
-import java.io.InterruptedIOException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.sql.SQLException;
-import java.util.Vector;
 
 /*=========================================
   =========================================*/
@@ -146,9 +143,10 @@ public class ClientHandler {
         e.printStackTrace();
     }
 
-    public void postAttempt(Quiz quiz, DateBuilder timeStarted) throws IOException {
+    public void postAttempt(Quiz quiz, DateBuilder timeStarted) throws IOException, ClassNotFoundException, InterruptedException {
         Result result = new Result();
         result.quizID = quiz.quizID;
+        if (quiz.getTimeClose().isElapsed()) throw new TimeSubmissionElapsedException();
         result.endTime = NetworkGlobals.getTimeNow();
         result.quizBlob = quiz;
         result.startTime = timeStarted;
@@ -157,7 +155,29 @@ public class ClientHandler {
         requestToken.authentication = result;
         requestToken.requestFor = "POSTATTEMPT";
         NetworkUtils.sendRequest(requestToken, sendSocket);
+        var attempt = (RequestToken)NetworkUtils.getObject(receiveSocket);
+        if (attempt.exception instanceof CannotReattemptQuizAgain r) throw r;
+    }
 
+    public Quiz getQuiz (int id) throws Exception {
+        RequestToken tkn = new RequestToken();
+        tkn.requestFor = "GETQUIZ";
+        tkn.authentication = id;
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var quiz = (RequestToken)NetworkUtils.getObject(receiveSocket);
+        if (quiz.exception !=null) throw ((RuntimeException)quiz.exception);
+        return (Quiz)quiz.response;
+    }
+
+    public Result getAttempt(int quizID) throws IOException, ClassNotFoundException, InterruptedException {
+        RequestToken tkn = new RequestToken();
+        tkn.signature = quizID;
+        tkn.authentication = user.userId;
+        tkn.requestFor = "GETATTEMPT";
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var request = ((RequestToken)NetworkUtils.getObject(receiveSocket));
+        if (request.exception != null) throw (RuntimeException)request.exception;
+        return (Result)request.response;
     }
 
 

@@ -4,6 +4,7 @@ import onBoard.network.exceptions.DateTimeFormatException;
 import onBoard.network.networkUtils.NetworkGlobals;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 public class DateBuilder implements Serializable {
     private int year;
@@ -42,10 +43,19 @@ public class DateBuilder implements Serializable {
         return this;
     }
 
+
+
     @Override
     public String toString() {
         if (year == 0 || month == 0 || day == 0) throw new DateTimeFormatException();
         return year+"/"+month+"/"+day+" " + hour+":"+minute+":00";
     }
+
+    public boolean isElapsed() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime specifiedDateTime = LocalDateTime.of(year, month, day, hour, minute, 0);
+        return now.isAfter(specifiedDateTime);
+    }
+
 
 }

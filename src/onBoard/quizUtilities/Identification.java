@@ -23,6 +23,7 @@ public class Identification extends Question {
     @Override
     public boolean checkAnswer(Object ans) {
         if (ans==null) return false;
+        this.attempt = ans;
         var answer = (String)ans;
         answer = transform(answer);
         var tempAnswer = transform(correctAnswer);

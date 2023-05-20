@@ -1,24 +1,18 @@
 package onBoard.connectivity;
 
 import onBoard.dataClasses.ClassData;
-import onBoard.dataClasses.ClassUser;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
+import onBoard.network.exceptions.CannotReattemptQuizAgain;
 import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
+import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.Quiz;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.Date;
-import javax.print.attribute.standard.DateTimeAtCreation;
-import javax.swing.*;
+import java.util.Calendar;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.time.chrono.ChronoLocalDate;
-import java.time.chrono.ChronoLocalDateTime;
 
 public class SQLConnector {
     private static String lucky_creds = "user_for_school";
@@ -140,6 +134,12 @@ public class SQLConnector {
     }
 
     public void postAttempt (Result result) throws SQLException, IOException {
+        var state = connection.prepareStatement("SELECT COUNT(*) as COUNT from result where quiz_id = " + result.quizID + " and student_id = " + result.studentID);
+        var resulting = state.executeQuery();
+        resulting.next();
+        if (resulting.getInt(1) != 0) {
+            throw new CannotReattemptQuizAgain();
+        }
         PreparedStatement statement = connection.prepareStatement("INSERT INTO result values (null, ?, ?, ?, ?, ?)");
         statement.setInt(1, result.studentID);
         statement.setInt(2, result.quizID);
@@ -147,6 +147,28 @@ public class SQLConnector {
         statement.setString(4, result.endTime.toString());
         statement.setBytes(5, Serialize.writeToBytes(result.quizBlob));
         statement.executeUpdate();
+    }
+
+    public Result getAttempt (int quizID, int userID) throws SQLException, IOException, ClassNotFoundException {
+        PreparedStatement statement = connection.prepareStatement("SELECT * from result where student_id = ? and quiz_id = ?");
+        statement.setInt(1, userID);
+        statement.setInt(2, quizID);
+        var result = statement.executeQuery();
+        result.next();
+        Result res = new Result();
+        res.studentID = userID;
+        res.quizID = quizID;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(result.getDate("submitted_time"));
+        res.endTime = new DateBuilder().setYear(calendar.get(Calendar.YEAR))
+                .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
+                .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
+        calendar.setTime(result.getDate("start_time"));
+        res.startTime =  new DateBuilder().setYear(calendar.get(Calendar.YEAR))
+                .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
+                .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
+        res.quizBlob = Serialize.constructFromBlob(result.getBinaryStream("quiz_blob"));
+        return res;
     }
 
 }

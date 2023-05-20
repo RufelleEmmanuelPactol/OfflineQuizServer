@@ -1,6 +1,6 @@
 package onBoard.quizUtilities.MultipleChoice;
 
-import onBoard.quizUtilities.MultipleChoice.Exceptions.MaxChoiceCapacity;
+import onBoard.network.exceptions.MaxChoiceCapacity;
 import onBoard.quizUtilities.Question;
 
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class MultipleChoiceQuestion extends Question {
     private Choice correctAnswer;
     protected int maxChoice;
-    private ArrayList<QuestionChoice> choices;
+    protected ArrayList<QuestionChoice> choices;
 
 
     public MultipleChoiceQuestion(String question, int maxChoice, Choice correctAnswer) {

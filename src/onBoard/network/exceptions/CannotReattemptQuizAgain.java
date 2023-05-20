@@ -1,5 +1,5 @@
 package onBoard.network.exceptions;
 
-public class CannotReattempt extends RuntimeException{
+public class  CannotReattemptQuizAgain extends RuntimeException{
 
 }

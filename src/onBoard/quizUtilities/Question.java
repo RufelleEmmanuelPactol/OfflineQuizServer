@@ -52,4 +52,5 @@ public abstract class Question  implements Serializable {
         if (isCorrect) return marks;
         return 0;
     }
+
 }

@@ -75,4 +75,18 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
     public void clearAttempts(){
         attempts.clear();
     }
+
+    @Override
+    public void log(){
+        System.out.println(prompt);
+        System.out.println("Choices: ");
+        for (var i : choices) {
+            System.out.println(i.choiceLetter.name() + ": " + i.choiceString);
+        }
+        System.out.println("The correct choices are:\n");
+        for (var x : correctChoices) {
+            System.out.println(x.toString() + choices.get(x.ordinal()));
+        }
+
+    }
 }
