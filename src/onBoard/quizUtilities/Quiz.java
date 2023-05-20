@@ -87,7 +87,9 @@ public class Quiz implements Serializable {
         for (int i=0; i<questions.size(); i++){
             System.out.println("Question " + (i+1) + ": ");
             questions.get(i).log();
-            System.out.println("Attempt was: " + questions.get(i).attempt);
+            if (questions.get(i) instanceof MultipleAnswerQuestion att) for (var attempts : (ArrayList)att.getAnswerAttempt()) System.out.println("Attempts were: " + attempts);
+            else System.out.println("Attempt was: " + questions.get(i).attempt);
+            System.out.println("Status is: " + questions.get(i).isCorrect);
         }
     }
 
@@ -111,7 +113,7 @@ public class Quiz implements Serializable {
     public double getMarks(){
         double marks = 0;
         for (var i : questions){
-            marks = i.getAwardedMarks();
+            marks += i.getAwardedMarks();
         } return marks;
     }
 

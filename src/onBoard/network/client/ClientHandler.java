@@ -1,4 +1,5 @@
 package onBoard.network.client;
+import onBoard.dataClasses.ClassData;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.exceptions.CannotReattemptQuizAgain;
@@ -12,6 +13,9 @@ import java.io.IOException;
 import java.net.ConnectException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+
+import static onBoard.network.networkUtils.NetworkUtils.getObject;
 
 /*=========================================
   =========================================*/
@@ -60,7 +64,7 @@ public class ClientHandler {
             if (NetworkGlobals.luckyMode) NetworkUtils.sendRequest(new RequestToken("AUTHLUCKY", authToken, signature), socket, signature);
             else NetworkUtils.sendRequest(new RequestToken("AUTH", authToken, signature), socket, signature);
             receiveSocket = serverSocket.accept();
-            RequestToken token = NetworkUtils.getObject(receiveSocket);
+            RequestToken token = getObject(receiveSocket);
             if (token.exception instanceof ConnectException) {
                 throw new InterruptedException();
             }
@@ -102,7 +106,7 @@ public class ClientHandler {
             System.out.println("User was null at one instance");
             requestToken = new RequestToken("USERINFO", authToken, signature);
             NetworkUtils.sendRequest(requestToken, sendSocket, signature);
-            this.user = (User) ((RequestToken) NetworkUtils.getObject(receiveSocket)).response;
+            this.user = (User) ((RequestToken) getObject(receiveSocket)).response;
             requestToken.response = this.user;
             if (requestToken.exception != null) {
                 throw (Throwable) requestToken.exception;
@@ -132,11 +136,11 @@ public class ClientHandler {
 
     public void postQuiz(Quiz q) throws IOException, ClassNotFoundException, InterruptedException {
         RequestToken tkn = new RequestToken();
-        tkn.requestFor="POSTQUIZ";
+        tkn.requestFor="POST QUIZ";
         tkn.authentication = NetworkGlobals.currentClass;
         tkn.response = q;
         NetworkUtils.sendRequest(tkn, sendSocket);
-        RequestToken response = NetworkUtils.getObject(receiveSocket);
+        RequestToken response = getObject(receiveSocket);
         if (response.exception == null )return;
         Exception e = (Exception) response.exception;
         NetworkGlobals.showMsg(e.toString());
@@ -153,31 +157,39 @@ public class ClientHandler {
         result.studentID = NetworkGlobals.session().getUser().userId;
         RequestToken requestToken = new RequestToken();
         requestToken.authentication = result;
-        requestToken.requestFor = "POSTATTEMPT";
+        requestToken.requestFor = "POST ATTEMPT";
         NetworkUtils.sendRequest(requestToken, sendSocket);
-        var attempt = (RequestToken)NetworkUtils.getObject(receiveSocket);
+        var attempt = (RequestToken) getObject(receiveSocket);
         if (attempt.exception instanceof CannotReattemptQuizAgain r) throw r;
     }
 
     public Quiz getQuiz (int id) throws Exception {
         RequestToken tkn = new RequestToken();
-        tkn.requestFor = "GETQUIZ";
+        tkn.requestFor = "GET QUIZ";
         tkn.authentication = id;
         NetworkUtils.sendRequest(tkn, sendSocket);
-        var quiz = (RequestToken)NetworkUtils.getObject(receiveSocket);
-        if (quiz.exception !=null) throw ((RuntimeException)quiz.exception);
+        var quiz = (RequestToken) getObject(receiveSocket);
+        if (quiz.exception !=null) throw ((Exception)quiz.exception);
         return (Quiz)quiz.response;
     }
 
-    public Result getAttempt(int quizID) throws IOException, ClassNotFoundException, InterruptedException {
+    public Result getAttempt(int quizID) throws Exception {
         RequestToken tkn = new RequestToken();
         tkn.signature = quizID;
         tkn.authentication = user.userId;
-        tkn.requestFor = "GETATTEMPT";
+        tkn.requestFor = "GET ATTEMPT";
         NetworkUtils.sendRequest(tkn, sendSocket);
-        var request = ((RequestToken)NetworkUtils.getObject(receiveSocket));
-        if (request.exception != null) throw (RuntimeException)request.exception;
+        var request = ((RequestToken) getObject(receiveSocket));
+        if (request.exception != null) throw (Exception)request.exception;
         return (Result)request.response;
+    }
+
+    public ArrayList<ClassData> getOngoingQuizzes (int userID) throws Exception {
+        RequestToken tkn = new RequestToken("GET ONGOING QUIZZES", userID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var token=  (RequestToken)NetworkUtils.getObject(receiveSocket);
+        if (token.exception != null) throw (Exception)token.exception;
+        return (ArrayList<ClassData>) token.response;
     }
 
 

@@ -44,6 +44,7 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
     @Override
     public boolean checkAnswer(Object ans) {
         attempts.add((Choice)ans);
+        if (correctChoices.contains(ans)) isCorrect = true;
         return correctChoices.contains(ans);
     }
 
@@ -59,6 +60,7 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
                 if (i == null) continue;
                 if (correctChoices.contains(i)) {
                     score += (marks / maxCounter);
+                    isCorrect = true;
                 } else score -= (marks / maxCounter);
             }
             return score > 0 ? score : 0;
@@ -68,7 +70,10 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
 
         for (var i : attempts){
             correctYet = correctChoices.contains(i) ? true : false;
-        } if (correctYet) return marks;
+        } if (correctYet) {
+            isCorrect = true;
+            return marks;
+        }
         return 0;
     }
 
@@ -85,7 +90,7 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
         }
         System.out.println("The correct choices are:\n");
         for (var x : correctChoices) {
-            System.out.println(x.toString() + choices.get(x.ordinal()));
+            System.out.println("CHOICE: " + x.name() + choices.get(x.ordinal()));
         }
 
     }

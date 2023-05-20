@@ -48,9 +48,6 @@ public abstract class Question  implements Serializable {
 
 
     // returns the taker's score
-    public double getAwardedMarks(){
-        if (isCorrect) return marks;
-        return 0;
-    }
+    public abstract double getAwardedMarks();
 
 }

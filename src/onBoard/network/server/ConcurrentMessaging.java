@@ -86,7 +86,7 @@ public class ConcurrentMessaging extends Thread {
                     NetworkUtils.sendRequest(tkn, sendingSocket);
                 } else if (tkn.requestFor.equals("CLOSE")) {
                     break;
-                } else if (tkn.requestFor.equals("POSTQUIZ")) {
+                } else if (tkn.requestFor.equals("POST QUIZ")) {
                     var quiz = (Quiz) tkn.response;
                     System.out.println(stat + roomSocket.getLocalPort() + "> There is a POST QUIZ request.");
                     try {
@@ -98,11 +98,11 @@ public class ConcurrentMessaging extends Thread {
                         NetworkUtils.sendRequest(req, sendingSocket);
                     }
 
-                } else if (tkn.requestFor.equals("GETQUIZZES")) {
+                } else if (tkn.requestFor.equals("GET QUIZZES")) {
 
-                } else if (tkn.requestFor.equals("ADDCLASS")) {
+                } else if (tkn.requestFor.equals("ADD CLASS")) {
 
-                } else if (tkn.requestFor.equals("POSTATTEMPT")) {
+                } else if (tkn.requestFor.equals("POST ATTEMPT")) {
                     System.out.println(stat + "> There is a request to POST ATTEMPT");
                     var attempt = (Result)tkn.authentication;
                     attempt.quizBlob.isAttempted = true;
@@ -114,7 +114,7 @@ public class ConcurrentMessaging extends Thread {
                         NetworkUtils.sendRequest(tkn, sendingSocket);
 
                     }
-                } else if (tkn.requestFor.equals("GETQUIZ")) {
+                } else if (tkn.requestFor.equals("GET QUIZ")) {
                     try {
                         System.out.println(stat + "> THERE is a request to get QUIZ");
                         var id = (int) tkn.authentication;
@@ -125,13 +125,25 @@ public class ConcurrentMessaging extends Thread {
                         tkn.exception = e;
                         NetworkUtils.sendRequest(tkn, sendingSocket);
                     }
-                } else if (tkn.requestFor.equals("GETATTEMPT")){
+                } else if (tkn.requestFor.equals("GET ATTEMPT")){
                     System.out.println(stat + "> THERE is a request to get GET ATTEMPT");
                     var id = (int)tkn.authentication;
                     var quizID = tkn.signature;
                     var result = NetworkUtils.sqlconnector().getAttempt(quizID, id);
                     tkn.response = result;
                     NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("GET ONGOING QUIZZES")){
+                    System.out.println(stat + "> Fetching ongoing quizzes!");
+                    try {
+                        var result = NetworkUtils.sqlconnector().getOngoingQuizzes((int)tkn.authentication);
+                        tkn.response = result;
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
+                        System.out.println(stat + "> Finished fetching quizzes");
+                    } catch (RuntimeException e){
+                        tkn.exception = e;
+                        System.out.println(stat + "> Encountered an error during fetch.");
+                    }
+
                 }
                 else {
                     System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);

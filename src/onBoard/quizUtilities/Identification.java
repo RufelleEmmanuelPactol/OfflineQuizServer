@@ -50,5 +50,9 @@ public class Identification extends Question {
         return correctAnswer;
     }
 
-
+    @Override
+    public double getAwardedMarks() {
+        if (isCorrect) return marks;
+        return 0;
+    }
 }

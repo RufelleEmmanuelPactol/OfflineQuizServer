@@ -11,6 +11,7 @@ import onBoard.quizUtilities.Quiz;
 
 import java.awt.*;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.io.IOException;
 
@@ -170,5 +171,47 @@ public class SQLConnector {
         res.quizBlob = Serialize.constructFromBlob(result.getBinaryStream("quiz_blob"));
         return res;
     }
+
+    public ArrayList<ClassData> getOngoingQuizzes(int userID){
+        try {
+            var statement = connection.prepareStatement("SELECT class_id from class_user where user_id = ?");
+            statement.setInt(1, userID);
+            var result = statement.executeQuery();
+            ArrayList<Integer> class_list = new ArrayList<>();
+            while (result.next()){
+                class_list.add(result.getInt("class_id"));
+            }
+            var array = new String[class_list.size()];
+            for (int i=0; i<class_list.size(); i++){
+                array[i] = Integer.toString(class_list.get(i));
+            }
+            String arrayAsString = String.join(", ", array);
+            statement = connection.prepareStatement("SELECT quiz_blob, class.class_id, join_code, user_id, firstname, lastname, class_name  from class, quiz, user where class.class_id in (" + arrayAsString+ ") and user.user_id = class.proctor_id and class.class_id = quiz.class_id and quiz.quiz_close > NOW()");
+            ArrayList<ClassData> data = new ArrayList<>();
+            result = statement.executeQuery();
+
+            while (result.next()){
+                ClassData entry = new ClassData();
+                entry.classId = result.getInt("class_id");
+                entry.className = result.getString("class_name");
+                entry.joinCode = result.getString("join_code");
+                entry.proctorID = result.getInt("user_id");
+                entry.proctorName = result.getString("firstname");
+                entry.proctorName.concat(" " + result.getString("lastname"));
+                entry.quiz = Serialize.constructFromBlob(result.getBytes("quiz_blob"));
+                data.add(entry);
+            } return data;
+
+        } catch (SQLException e){
+            System.err.println(e);
+            e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } return null;
+    }
+
+
 
 }

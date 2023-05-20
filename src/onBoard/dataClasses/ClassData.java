@@ -1,5 +1,7 @@
 package onBoard.dataClasses;
 
+import onBoard.quizUtilities.Quiz;
+
 import java.io.Serializable;
 
 public class ClassData implements Serializable {
@@ -7,15 +9,18 @@ public class ClassData implements Serializable {
     public String className;
     public String joinCode;
     public int proctorID;
-    public String courseName;
+    public String proctorName;
+    public Quiz quiz;
+
 
     public ClassData(int classId, String className, String joinCode, int proctorID, String courseName) {
         this.classId = classId;
         this.className = className;
         this.joinCode = joinCode;
         this.proctorID = proctorID;
-        this.courseName = courseName;
+
     }
+
 
     public ClassData(){}
 
@@ -26,7 +31,6 @@ public class ClassData implements Serializable {
                 ", className='" + className + '\'' +
                 ", joinCode='" + joinCode + '\'' +
                 ", proctorID=" + proctorID +
-                ", courseName='" + courseName + '\'' +
                 '}';
     }
 }

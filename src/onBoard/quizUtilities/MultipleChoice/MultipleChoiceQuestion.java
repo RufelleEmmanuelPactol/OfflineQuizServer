@@ -26,8 +26,15 @@ public class MultipleChoiceQuestion extends Question {
     public boolean checkAnswer (Object ans) {
         if (ans==null) return false;
         var attempt = (Choice)ans;
+        this.attempt = attempt;
         isCorrect = attempt.equals(correctAnswer) ? true : false;
         return isCorrect;
+    }
+
+    @Override
+    public double getAwardedMarks() {
+        if (isCorrect) return marks;
+        return 0;
     }
 
     public MultipleChoiceQuestion addChoice (String choice){
