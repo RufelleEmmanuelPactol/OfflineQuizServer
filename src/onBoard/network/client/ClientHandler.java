@@ -1,5 +1,6 @@
 package onBoard.network.client;
 import onBoard.dataClasses.ClassData;
+import onBoard.dataClasses.Requests;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.exceptions.CannotReattemptQuizAgain;
@@ -190,6 +191,38 @@ public class ClientHandler {
         var token=  (RequestToken)NetworkUtils.getObject(receiveSocket);
         if (token.exception != null) throw (Exception)token.exception;
         return (ArrayList<ClassData>) token.response;
+    }
+
+    public boolean isValidClassCode(String code ) throws Exception {
+        RequestToken tkn = new RequestToken("VALID CODE", code);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception != null ) throw ((Exception)tkn.exception);
+        return (boolean) tkn.response;
+    }
+
+    public void sendRequest(String code ) throws Exception{
+        RequestToken tkn = new RequestToken("SEND REQUEST", code);
+        tkn.signature = NetworkGlobals.getCurrentUser().userId;
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var token  = (RequestToken) NetworkUtils.getObject(receiveSocket);
+        if (token.exception != null) throw (Exception)token.exception;
+    }
+
+    public ArrayList<Requests> getAllRequests(int proctorID) throws Exception {
+        RequestToken tkn = new RequestToken("GET REQUESTS", proctorID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var token  = (RequestToken) NetworkUtils.getObject(receiveSocket);
+        if (token.exception != null) throw (Exception)token.exception;
+        return (ArrayList<Requests>) token.response;
+    }
+
+    public void approveRequest(int studentID, int classID) throws Exception{
+        RequestToken tkn = new RequestToken("APPROVE REQUEST", studentID);
+        tkn.signature = classID;
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        var req = (RequestToken)NetworkUtils.getObject(receiveSocket);
+        if (req.exception != null )throw (Exception)req.exception;
     }
 
 

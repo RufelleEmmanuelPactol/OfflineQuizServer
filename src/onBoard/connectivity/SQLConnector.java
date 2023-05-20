@@ -1,6 +1,7 @@
 package onBoard.connectivity;
 
 import onBoard.dataClasses.ClassData;
+import onBoard.dataClasses.Requests;
 import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.exceptions.CannotReattemptQuizAgain;
@@ -155,21 +156,25 @@ public class SQLConnector {
         statement.setInt(1, userID);
         statement.setInt(2, quizID);
         var result = statement.executeQuery();
-        result.next();
-        Result res = new Result();
-        res.studentID = userID;
-        res.quizID = quizID;
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(result.getDate("submitted_time"));
-        res.endTime = new DateBuilder().setYear(calendar.get(Calendar.YEAR))
-                .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
-                .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
-        calendar.setTime(result.getDate("start_time"));
-        res.startTime =  new DateBuilder().setYear(calendar.get(Calendar.YEAR))
-                .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
-                .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
-        res.quizBlob = Serialize.constructFromBlob(result.getBinaryStream("quiz_blob"));
-        return res;
+        if (result.next()) {
+            Result res = new Result();
+            res.studentID = userID;
+            res.quizID = quizID;
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(result.getDate("submitted_time"));
+            res.endTime = new DateBuilder().setYear(calendar.get(Calendar.YEAR))
+                    .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
+                    .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
+            calendar.setTime(result.getDate("start_time"));
+            res.startTime = new DateBuilder().setYear(calendar.get(Calendar.YEAR))
+                    .setMonth(calendar.get(Calendar.MONTH)).setDay(calendar.get(Calendar.DATE))
+                    .setHour(calendar.get(Calendar.HOUR)).setMinute(calendar.get(Calendar.MINUTE));
+            res.quizBlob = Serialize.constructFromBlob(result.getBinaryStream("quiz_blob"));
+            return res;
+        }
+        return new Result();
+
+
     }
 
     public ArrayList<ClassData> getOngoingQuizzes(int userID){
@@ -180,7 +185,7 @@ public class SQLConnector {
             ArrayList<Integer> class_list = new ArrayList<>();
             while (result.next()){
                 class_list.add(result.getInt("class_id"));
-            }
+            } if (class_list.size() == 0) return null;
             var array = new String[class_list.size()];
             for (int i=0; i<class_list.size(); i++){
                 array[i] = Integer.toString(class_list.get(i));
@@ -211,6 +216,66 @@ public class SQLConnector {
             throw new RuntimeException(e);
         } return null;
     }
+
+    public boolean isValidClassCode (String classCode) throws SQLException {
+        var prep = connection.prepareStatement("SELECT count(*) from class where join_code = ?");
+        prep.setString(1, classCode);
+        var res = prep.executeQuery();
+        res.next();
+        return res.getInt(1) == 0 ? false : true;
+    }
+
+    public void sendRequest (int studentID, String code) throws SQLException {
+        var prep = connection.prepareStatement("SELECT class_id from class where join_code = ?");
+        prep.setString(1, code);
+        var res = prep.executeQuery();
+        res.next();
+        int classID = res.getInt(1);
+         prep = connection.prepareStatement("SELECT COUNT(*) from requests where user_id = ? and class_id = ?");
+        prep.setInt(1, studentID);
+        prep.setInt(2, classID);
+         res = prep.executeQuery();
+        res.next();
+        if (res.getInt(1) != 0) return;
+        prep = connection.prepareStatement("INSERT INTO requests values(?, ?, 0)");
+        prep.setInt(2, studentID);
+        prep.setInt(1, classID);
+        prep.executeUpdate();
+    }
+
+
+    public ArrayList<Requests> getAllRequests(int proctorID) throws SQLException {
+        var statement = connection.prepareStatement("SELECT class_id from class where proctor_id = ?");
+        statement.setInt(1, proctorID);
+        var result = statement.executeQuery();
+        ArrayList<Integer> class_list = new ArrayList<>();
+        while (result.next()){
+            class_list.add(result.getInt("class_id"));
+        }
+        var array = new String[class_list.size()];
+        for (int i=0; i<class_list.size(); i++){
+            array[i] = Integer.toString(class_list.get(i));
+        }
+        String arrayAsString = String.join(", ", array);
+        var prep = connection.prepareStatement("SELECT firstname, lastname, requests.user_id, requests.class_id, class_name from class, user, requests where requests.class_id = class.class_id and requests.user_id = user.user_id and requests.class_id in (" + arrayAsString + ") and isApproved = 0");
+        var res = prep.executeQuery();
+        ArrayList<Requests> ret = new ArrayList<>();
+        while (res.next()){
+            Requests r = new Requests(res.getString("firstname"), res.getString("lastname"), res.getInt("user_id"),  res.getString("class_name"), res.getInt("class_id"));
+            ret.add(r);
+        } return ret;
+    }
+
+    public void ApproveRequests (int studentID, int classID) throws SQLException {
+        var prep = connection.prepareStatement("UPDATE requests set isApproved = 1 where user_id = " + studentID + " and class_id = " + classID);
+        prep.executeUpdate();
+        prep = connection.prepareStatement("INSERT INTO class_user values (null, ?, ?)");
+        prep.setInt(1, classID);
+        prep.setInt(2, studentID);
+        prep.executeUpdate();
+    }
+
+
 
 
 

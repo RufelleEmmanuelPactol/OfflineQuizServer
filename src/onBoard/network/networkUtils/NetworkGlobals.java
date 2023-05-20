@@ -10,6 +10,10 @@ import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.nio.channels.AlreadyConnectedException;
 import java.time.LocalDateTime;
 import java.util.Locale;
 
@@ -92,7 +96,13 @@ public class NetworkGlobals {
         return builder;
     }
 
+    public static void connectionOfficer(){
+
+    }
+
     public static User getCurrentUser(){
         return session().getUser();
     }
+
+    public static int t = 0;
 }

@@ -142,12 +142,46 @@ public class ConcurrentMessaging extends Thread {
                     } catch (RuntimeException e){
                         tkn.exception = e;
                         System.out.println(stat + "> Encountered an error during fetch.");
+                        tkn.exception = e;
+                        NetworkUtils.sendRequest(tkn, sendingSocket);
                     }
 
+                } else if (tkn.requestFor.equals("VALID CODE")){
+                    System.out.println(stat + "> Checking if join code is valid");
+                    try {
+                        tkn.response = NetworkUtils.sqlconnector().isValidClassCode((String) tkn.authentication);
+                    } catch (SQLException e){
+                        tkn.exception = e;
+                    } NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("SEND REQUEST")){
+                    System.out.println(stat + "> Sending a request to server.");
+                    try {
+                        NetworkUtils.sqlconnector().sendRequest( tkn.signature, (String)tkn.authentication);
+                        System.out.println(stat + "> Succeeded in sending a request to server.");
+                    } catch (Exception e){
+                        tkn.exception = e;
+                    }
+                    NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("GET REQUESTS")) {
+                    System.out.println(stat + "> Retrieving all requests.");
+                    try {
+                        var x = NetworkUtils.sqlconnector().getAllRequests((int) tkn.authentication);
+                        tkn.response = x;
+                    } catch (Exception e) {
+                        tkn.exception = e;
+                    }
+                    NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("APPROVE REQUEST")){
+                    try {
+                        NetworkUtils.sqlconnector().ApproveRequests((int)tkn.authentication, tkn.signature);
+                    } catch (Exception e){
+                        tkn.exception = e;
+                    } NetworkUtils.sendRequest(tkn, sendingSocket);
                 }
                 else {
                     System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);
                     tkn.exception = new InvalidRequestForHeader();
+                    NetworkUtils.sendRequest(tkn, sendingSocket);
                 }
             }
             sendingSocket.close();

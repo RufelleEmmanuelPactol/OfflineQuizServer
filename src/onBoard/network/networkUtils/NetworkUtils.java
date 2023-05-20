@@ -20,7 +20,6 @@ public class NetworkUtils {
 
             // sleep to add time buffer to send bytes
           waitForBufferInstance(inputStream);
-            Thread.sleep(1000);
 
             while (inputStream.available() != 0) byteStreamBuffer.add(inputStream.readByte());
             byte[] objectByte = new byte[byteStreamBuffer.size()];
