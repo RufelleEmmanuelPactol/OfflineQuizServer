@@ -57,5 +57,23 @@ public class DateBuilder implements Serializable {
         return now.isAfter(specifiedDateTime);
     }
 
+    public int getYear() {
+        return year;
+    }
 
+    public int getMonth() {
+        return month;
+    }
+
+    public int getDay() {
+        return day;
+    }
+
+    public int getHour() {
+        return hour;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
 }

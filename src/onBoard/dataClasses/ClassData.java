@@ -1,5 +1,6 @@
 package onBoard.dataClasses;
 
+import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.quizUtilities.Quiz;
 
 import java.io.Serializable;
@@ -18,7 +19,6 @@ public class ClassData implements Serializable {
         this.className = className;
         this.joinCode = joinCode;
         this.proctorID = proctorID;
-
     }
 
 
