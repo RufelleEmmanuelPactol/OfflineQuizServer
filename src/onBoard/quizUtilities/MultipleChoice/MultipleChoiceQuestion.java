@@ -48,6 +48,12 @@ public class MultipleChoiceQuestion extends Question {
         System.out.println("The correct choice is: " + correctAnswer.name());
     }
 
+    public void addChoiceList(String[] choice){
+        for (int i=0; i<maxChoice; i++){
+            addChoice(choice[i]);
+        }
+    }
+
 
 
 }

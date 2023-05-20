@@ -1,11 +1,14 @@
 package onBoard.network.client;
 
+import onBoard.connectivity.SQLConnector;
 import onBoard.dataClasses.ClassData;
 import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.NetworkUtils;
+import onBoard.quizUtilities.MultipleChoice.Choice;
 import onBoard.quizUtilities.Quiz;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class ClientMain {
     public static void main(String[] args) throws Throwable {
@@ -37,18 +40,23 @@ public class ClientMain {
        Quiz setup: ensure that the setTimeClose and setTimeOpen
        is properly invoked to avoid server-side exceptions.
         */
-                Quiz q = new Quiz("Alter");
+                Quiz q = new Quiz("Ego");
+                q.getQuestionNumber(1);
+
                 q.setTimeOpen().setYear(2000).setMonth(1).setDay(2);
                 q.setTimeClose().setYear(2000).setMonth(1).setDay(2);
 
                 // The proper postquiz method
                 try {
-                    NetworkGlobals.session().postQuiz(q);
+                   // NetworkGlobals.session().postQuiz(q);
+                    SQLConnector n = new SQLConnector();
+                    var quiz = n.getQuiz(237);
+                    System.out.println(quiz.quizID);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
-                } catch (InterruptedException e) {
+                }  catch (SQLException e) {
                     throw new RuntimeException(e);
                 }
                 try {
@@ -58,7 +66,7 @@ public class ClientMain {
                 }
             }
         };
-        for (int i=0; i<20; i++){
+        for (int i=0; i<1; i++){
             Thread thread = new Thread(a);
             Thread.sleep(2000);
             thread.start();

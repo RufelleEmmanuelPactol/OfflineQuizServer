@@ -123,6 +123,7 @@ public class ClientHandler {
     Posts a quiz to the database via the server.
     Requirements: currentClass must be initialized.
     To initialize, go to NetworkGlobals.currentClass
+    This is for the teacher only.
     =========================================*/
 
     public void postQuiz(Quiz q) throws IOException, ClassNotFoundException, InterruptedException {
@@ -136,9 +137,9 @@ public class ClientHandler {
         Exception e = (Exception) response.exception;
         NetworkGlobals.showMsg(e.toString());
         e.printStackTrace();
-
-
     }
+
+
 
 
 

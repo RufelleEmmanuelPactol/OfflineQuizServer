@@ -2,12 +2,15 @@ package onBoard.connectivity;
 
 import onBoard.dataClasses.ClassData;
 import onBoard.dataClasses.ClassUser;
+import onBoard.dataClasses.Result;
 import onBoard.dataClasses.User;
 import onBoard.network.networkUtils.*;
 import onBoard.network.exceptions.InvalidAuthException;
 import onBoard.quizUtilities.Quiz;
 
 import java.awt.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Date;
 import javax.print.attribute.standard.DateTimeAtCreation;
 import javax.swing.*;
@@ -65,15 +68,36 @@ public class SQLConnector {
     }
 
 
-    public void postQuiz (Quiz quiz, ClassData instance) throws IOException, SQLException {
-        var quizByteStream = Serialize.writeToBytes(quiz);
-        var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob, quiz_name, class_id, quiz_open, quiz_close) values (null, ?, ?, ?, ?, ?)");
-        prepared.setBytes(1, quizByteStream);
-        prepared.setString(2, quiz.getQuizName());
-        prepared.setInt(3, instance.classId);
-        prepared.setString(4, quiz.getTimeOpen().toString());
-        prepared.setString(5, quiz.getTimeClose().toString());
-        prepared.executeUpdate();
+    public void postQuiz (Quiz quiz, ClassData instance)  {
+        try {
+            var quizByteStream = Serialize.writeToBytes(quiz);
+            var prepared = connection.prepareStatement("INSERT INTO quiz(quiz_id, quiz_blob, quiz_name, class_id, quiz_open, quiz_close) values (null, ?, ?, ?, ?, ?)");
+            prepared.setBytes(1, quizByteStream);
+            prepared.setString(2, quiz.getQuizName());
+            prepared.setInt(3, instance.classId);
+            prepared.setString(4, quiz.getTimeOpen().toString());
+            prepared.setString(5, quiz.getTimeClose().toString());
+            prepared.executeUpdate();
+            int id = getID("quiz", "quiz_id");
+            prepared = connection.prepareStatement("SELECT quiz_blob from quiz where quiz_id = " + id);
+            var result = prepared.executeQuery();
+            result.next();
+            Quiz quizWithID = Serialize.constructFromBlob(result.getBinaryStream("quiz_blob"));
+            quizWithID.quizID = id;
+            prepared = connection.prepareStatement("UPDATE quiz set quiz_blob = ? where quiz_id = " + id);
+            prepared.setBytes(1, Serialize.writeToBytes(quizWithID));
+            prepared.executeUpdate();
+        }catch (SQLException | ClassNotFoundException | IOException e){
+            System.err.println(e);
+            e.printStackTrace();
+        }
+    }
+
+    public int getID(String table, String ID) throws SQLException {
+        var prepared = connection.prepareStatement("SELECT MAX(" + ID + ") as count from " + table);
+        var rs = prepared.executeQuery();
+        rs.next();
+        return rs.getInt("count");
     }
 
     public Quiz getQuiz (int id) throws SQLException, IOException, ClassNotFoundException {
@@ -116,6 +140,10 @@ public class SQLConnector {
         }
         return new User(set.getInt("user_id"), set.getString("firstname")
         , set.getString("lastname"), set.getString("email"), set.getString("organization_name"), set.getInt("is_proctor"));
+    }
+
+    public void postAttempt (Quiz q){
+        Result result = new Result();
     }
 
 }

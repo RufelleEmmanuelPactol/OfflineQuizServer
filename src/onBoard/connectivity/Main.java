@@ -28,14 +28,8 @@ public class Main {
         cls.classId = 0;
         NetworkGlobals.currentClass = cls;
         SQLConnector sqlc;
-        try {
             sqlc = new SQLConnector();
             sqlc.postQuiz(myquiz, cls);
 
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }  catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

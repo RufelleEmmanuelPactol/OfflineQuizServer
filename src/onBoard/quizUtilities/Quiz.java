@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Quiz implements Serializable {
+    public int quizID;
     protected ArrayList<Question> questions;
     protected String quizName;
     public int teacherID;

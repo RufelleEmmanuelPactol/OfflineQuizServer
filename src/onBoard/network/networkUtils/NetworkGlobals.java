@@ -3,11 +3,14 @@ package onBoard.network.networkUtils;
 import onBoard.dataClasses.ClassData;
 import onBoard.network.client.ClientHandler;
 import onBoard.network.exceptions.InvalidAuthException;
+import onBoard.network.utils.DateBuilder;
 
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.Locale;
 
 public class NetworkGlobals {
 
@@ -74,4 +77,17 @@ public class NetworkGlobals {
     current class instance.
     ================================ */
     public static ClassData currentClass = null;
+
+    /*================================
+    Retrieves current time and returns
+    a DateBuilder object with filled-up
+    current date time.
+    ==================================*/
+
+    public static DateBuilder getTimeNow(){
+        var time = LocalDateTime.now();
+        DateBuilder builder = new DateBuilder().setYear(time.getYear()).setMonth(time.getMonthValue())
+                .setDay(time.getDayOfMonth()).setHour(time.getHour()).setMinute(time.getMinute());
+        return builder;
+    }
 }
