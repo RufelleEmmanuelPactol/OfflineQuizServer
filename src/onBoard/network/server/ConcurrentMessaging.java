@@ -93,6 +93,7 @@ public class ConcurrentMessaging extends Thread {
                         NetworkUtils.sqlconnector().postQuiz(quiz, (ClassData) tkn.authentication); // implement quiz
                         NetworkUtils.sendRequest(new RequestToken(), sendingSocket);
                     } catch (Exception e) {
+                        System.err.println(stat + "> There was an error during posting quiz, reason: " + e.getMessage());
                         var req = new RequestToken();
                         req.exception = e;
                         NetworkUtils.sendRequest(req, sendingSocket);
@@ -188,6 +189,19 @@ public class ConcurrentMessaging extends Thread {
                     try {
                         var respo =NetworkUtils.sqlconnector().getProctorClasses((int)tkn.authentication);
                         tkn.response = respo;
+                    } catch (Exception e){
+                        tkn.exception = e;
+                    } NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("GET QUIZZES PER CLASS")){
+                    try {
+                        var respo =NetworkUtils.sqlconnector().getQuizzesPerClass((int)tkn.authentication);
+                        tkn.response = respo;
+                    } catch (Exception e){
+                        tkn.exception = e;
+                    } NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("UPDATE QUIZ")){
+                    try {
+                        NetworkUtils.sqlconnector().updateQuiz((Quiz)tkn.authentication);
                     } catch (Exception e){
                         tkn.exception = e;
                     } NetworkUtils.sendRequest(tkn, sendingSocket);

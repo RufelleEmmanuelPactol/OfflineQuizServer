@@ -4,7 +4,10 @@ import onBoard.network.exceptions.DateTimeFormatException;
 import onBoard.network.networkUtils.NetworkGlobals;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+
 
 public class DateBuilder implements Serializable {
     private int year;
@@ -75,5 +78,14 @@ public class DateBuilder implements Serializable {
 
     public int getMinute() {
         return minute;
+    }
+
+    public Date toSqlDate() {
+        if (year == 0 || month == 0 || day == 0)
+            throw new DateTimeFormatException();
+
+        LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, 0);
+        long milliseconds = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        return new Date(milliseconds);
     }
 }

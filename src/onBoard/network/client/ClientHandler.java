@@ -242,6 +242,21 @@ public class ClientHandler {
         return (ArrayList<ClassData>) tkn.response;
     }
 
+    public ArrayList<Quiz> getClassQuizzes (int classID) throws Exception{
+        RequestToken tkn = new RequestToken("GET QUIZZES PER CLASS", classID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+        return (ArrayList<Quiz>) tkn.response;
+    }
+
+    public void updateQuiz (Quiz quiz) throws Exception{
+        RequestToken tkn = new RequestToken("UPDATE QUIZ", quiz);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+    }
+
 
 
 

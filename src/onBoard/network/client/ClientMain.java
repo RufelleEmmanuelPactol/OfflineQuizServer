@@ -4,6 +4,7 @@ import onBoard.connectivity.SQLConnector;
 import onBoard.dataClasses.ClassData;
 import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.networkUtils.NetworkUtils;
+import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.MultipleChoice.Choice;
 import onBoard.quizUtilities.MultipleChoice.MultipleAnswerQuestion;
 import onBoard.quizUtilities.MultipleChoice.MultipleChoiceQuestion;
@@ -20,11 +21,12 @@ public class ClientMain {
                 try {
                     NetworkGlobals.createSession("jtulin@gmail.com", "jtulin");
                     NetworkGlobals.currentClass = new ClassData();
+                    Quiz q = new Quiz("test");
+                    DateBuilder db = new DateBuilder();
+                    
                     NetworkGlobals.currentClass.classId = 1;
-                    var x = NetworkGlobals.session().getProctorClasses(1);
-                    x.forEach(i -> {
-                        System.out.println(i);
-                    });
+                    NetworkGlobals.session().postQuiz(q);
+
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {

@@ -191,7 +191,6 @@ public class SQLConnector {
             data.add(entity);
         } return data;
 
-
     }
 
     public ArrayList<ClassData> getProctorClasses (int userID) throws Exception{
@@ -306,6 +305,30 @@ public class SQLConnector {
         prep = connection.prepareStatement("INSERT INTO class_user values (null, ?, ?)");
         prep.setInt(1, classID);
         prep.setInt(2, studentID);
+        prep.executeUpdate();
+    }
+
+    public ArrayList<Quiz> getQuizzesPerClass (int classID) throws Exception {
+        var prep = connection.prepareStatement("SELECT quiz_blob, quiz_id FROM quiz WHERE class_id = ?");
+        prep.setInt(1, classID);
+        var rsSet = prep.executeQuery();
+        ArrayList<Quiz> q = new ArrayList<>();
+        while (rsSet.next()){
+            var qz = (Quiz) Serialize.constructFromBlob(rsSet.getBytes("quiz_blob"));
+            qz.quizID = rsSet.getInt("quiz_id");
+            q.add(qz);
+        } return q;
+    }
+
+    public void updateQuiz (Quiz q) throws Exception {
+        var prep = connection.prepareStatement("UPDATE quiz set quiz_blob = ?, quiz_name = ?, quiz_open = ?, quiz_close = ?, class_id = ? where quiz_id = ?");
+        prep.setBytes(1, Serialize.writeToBytes(q));
+        prep.setString(2, q.getQuizName());
+        prep.setDate(3, q.getTimeOpen().toSqlDate());
+        prep.setDate(4, q.getTimeClose().toSqlDate());
+        prep.setInt(5, q.getClassID());
+        prep.setInt(6, q.quizID);
+        System.out.println(prep);
         prep.executeUpdate();
     }
 
