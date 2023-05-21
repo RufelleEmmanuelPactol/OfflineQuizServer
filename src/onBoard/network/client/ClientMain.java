@@ -21,20 +21,10 @@ public class ClientMain {
                     NetworkGlobals.createSession("jtulin@gmail.com", "jtulin");
                     NetworkGlobals.currentClass = new ClassData();
                     NetworkGlobals.currentClass.classId = 1;
-                    var x = NetworkGlobals.session().getOngoingQuizzes(5);
-                    Quiz q = new Quiz("dd");
-                    ((MultipleChoiceQuestion)q.getQuestionNumber(1)).getChoices().get(0).choiceLetter.name();
-                    // multiple answer add question
-                    q.addMultipleAnswerQuestion("question prompt", 3, new Choice[]{Choice.A, Choice.B}).setMarks(10);
-                    // multiple choice add question
-                    q.addMultipleChoiceQuestion("question prompt", 2, Choice.B).setMarks(10);
-                    // replace
-                    q.addMultipleChoiceQuestion("question prompt", 2, Choice.B, 2).setMarks(10);
-                    // add identification
-                    q.addIdentificationQuestion("question", "");
-                    for (var i : x){
+                    var x = NetworkGlobals.session().getProctorClasses(1);
+                    x.forEach(i -> {
                         System.out.println(i);
-                    }
+                    });
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 } catch (ClassNotFoundException e) {

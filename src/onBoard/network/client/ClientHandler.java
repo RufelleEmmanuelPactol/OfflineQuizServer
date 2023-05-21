@@ -226,9 +226,21 @@ public class ClientHandler {
 
     }
 
-//    public ArrayList<ClassData> getAllClasses (int userID){
-//
-//    }
+    public ArrayList<ClassData> getAllClasses (int userID) throws Exception{
+        RequestToken tkn = new RequestToken("GET USER CLASSES", userID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+        return (ArrayList<ClassData>) tkn.response;
+    }
+
+    public ArrayList<ClassData> getProctorClasses (int userID) throws Exception{
+        RequestToken tkn = new RequestToken("GET PROCTOR CLASSES", userID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+        return (ArrayList<ClassData>) tkn.response;
+    }
 
 
 

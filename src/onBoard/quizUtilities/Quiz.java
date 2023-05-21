@@ -103,22 +103,6 @@ public class Quiz implements Serializable {
         } return marks;
     }
 
-    public int getQuizID()
-        return quizID;
-    }
-
-    public DateBuilder getOpens() {
-        return opens;
-    }
-
-    public DateBuilder getCloses() {
-        return closes;
-    }
-
-    public boolean isAttempted() {
-        return isAttempted;
-    }
-
     public Quiz setQuizID(int quizID) {
         this.quizID = quizID;
         return this;

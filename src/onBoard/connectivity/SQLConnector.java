@@ -177,13 +177,39 @@ public class SQLConnector {
 
     }
 
-//    public ArrayList<ClassData> getClasses (int userID) throws Exception{
-//        var statement = connection.prepareStatement("SELECT class_user.class_id from class_user,  where user_id = ?");
-//        statement.setInt(1, userID);
-//        var result = statement.executeQuery();
-//
-//
-//    }
+    public ArrayList<ClassData> getUserClasses (int userID) throws Exception{
+        var statement = connection.prepareStatement("SELECT class.class_name, class.class_id, class.proctor_id, user.firstname, user.lastname from class_user, class, user where class_user.user_id = ? and class_user.class_id = class.class_id and user.user_id = class.proctor_id;");
+        statement.setInt(1, userID);
+        var result = statement.executeQuery();
+        ArrayList<ClassData> data =  new ArrayList<>();
+        while (result.next()){
+            var entity = new ClassData();
+            entity.classId = result.getInt("class_id");
+            entity.className = result.getString("class_name");
+            entity.proctorID = result.getInt("proctor_id");
+            entity.proctorName = result.getString("firstname") + " " + result.getString("lastname");
+            data.add(entity);
+        } return data;
+
+
+    }
+
+    public ArrayList<ClassData> getProctorClasses (int userID) throws Exception{
+        var statement = connection.prepareStatement("SELECT * from class where proctor_id = ?");
+        statement.setInt(1, userID);
+        var result = statement.executeQuery();
+        ArrayList<ClassData> data =  new ArrayList<>();
+        while (result.next()){
+            var entity = new ClassData();
+            entity.classId = result.getInt("class_id");
+            entity.className = result.getString("class_name");
+            entity.proctorID = result.getInt("proctor_id");
+            entity.joinCode = result.getString("join_code");
+            data.add(entity);
+        } return data;
+
+
+    }
 
     public ArrayList<ClassData> getOngoingQuizzes(int userID){
         try {
