@@ -257,6 +257,14 @@ public class ClientHandler {
         if (tkn.exception!=null) throw (Exception) tkn.exception;
     }
 
+    public ArrayList<ArrayList<String>> getAllAttempts(int quizID) throws Exception{
+        RequestToken tkn = new RequestToken("GET ALL ATTEMPTS", quizID);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+        return (ArrayList<ArrayList<String>>) tkn.response;
+
+    }
 
 
 

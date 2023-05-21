@@ -1,5 +1,6 @@
 package onBoard.dataClasses;
 
+import onBoard.network.networkUtils.NetworkGlobals;
 import onBoard.network.utils.DateBuilder;
 import onBoard.quizUtilities.Quiz;
 

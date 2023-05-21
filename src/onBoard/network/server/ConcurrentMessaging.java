@@ -205,6 +205,13 @@ public class ConcurrentMessaging extends Thread {
                     } catch (Exception e){
                         tkn.exception = e;
                     } NetworkUtils.sendRequest(tkn, sendingSocket);
+                } else if (tkn.requestFor.equals("GET ALL ATTEMPTS")){
+                    try {
+                        var req = NetworkUtils.sqlconnector().getAllAttempts((int)tkn.authentication);
+                        tkn.response = req;
+                    } catch (Exception e){
+                        tkn.exception = e;
+                    } NetworkUtils.sendRequest(tkn, sendingSocket);
                 }
                 else {
                     System.out.println(stat + roomSocket.getLocalPort() + "> Invalid request made with requestFor header: " + tkn.requestFor);

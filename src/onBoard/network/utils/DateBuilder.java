@@ -81,8 +81,10 @@ public class DateBuilder implements Serializable {
     }
 
     public Date toSqlDate() {
-        if (year == 0 || month == 0 || day == 0)
+        if (year == 0 || month == 0 || day == 0) {
+            System.out.println(year + " " + month + " " + day);
             throw new DateTimeFormatException();
+        }
 
         LocalDateTime dateTime = LocalDateTime.of(year, month, day, hour, minute, 0);
         long milliseconds = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();

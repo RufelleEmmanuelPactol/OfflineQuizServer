@@ -15,6 +15,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class SQLConnector {
     private static String lucky_creds = "user_for_school";
@@ -68,8 +69,8 @@ public class SQLConnector {
             prepared.setBytes(1, quizByteStream);
             prepared.setString(2, quiz.getQuizName());
             prepared.setInt(3, instance.classId);
-            prepared.setString(4, quiz.getTimeOpen().toString());
-            prepared.setString(5, quiz.getTimeClose().toString());
+            prepared.setDate(4, quiz.getTimeOpen().toSqlDate());
+            prepared.setDate(5, quiz.getTimeClose().toSqlDate());
             prepared.executeUpdate();
             int id = getID("quiz", "quiz_id");
             prepared = connection.prepareStatement("SELECT quiz_blob from quiz where quiz_id = " + id);
@@ -322,6 +323,7 @@ public class SQLConnector {
 
     public void updateQuiz (Quiz q) throws Exception {
         var prep = connection.prepareStatement("UPDATE quiz set quiz_blob = ?, quiz_name = ?, quiz_open = ?, quiz_close = ?, class_id = ? where quiz_id = ?");
+        System.out.println(q.getTimeClose().toSqlDate());
         prep.setBytes(1, Serialize.writeToBytes(q));
         prep.setString(2, q.getQuizName());
         prep.setDate(3, q.getTimeOpen().toSqlDate());
@@ -331,9 +333,43 @@ public class SQLConnector {
         prep.executeUpdate();
     }
 
-    public ArrayList<User> getAllStudentsOfClass (int classID){
-        ArrayList<User> user = new ArrayList<>();
+    public ArrayList<User> getAllStudentsOfClass (int classID) throws Exception{
+        ArrayList<User> users = new ArrayList<>();
+        var prep = connection.prepareStatement("SELECT firstname, lastname, user.user_id from user, class_user where user.user_id = class_user.user_id and class_id = ?;");
+        prep.setInt(1, classID);
+        var set = prep.executeQuery();
+        while (set.next()){
+            User user = new User();
+            user.firstname = set.getString("firstname");
+            user.lastname = set.getString("lastname");
+            user.userId = set.getInt("user_id");
+            users.add(user);
+        } return users;
+    }
 
+    public ArrayList<ArrayList<String>> getAllAttempts(int quizID) throws Exception{
+        ArrayList<ArrayList<String>> table = new ArrayList<>();
+        var prep = connection.prepareStatement("SELECT class_id from quiz where quiz_id = ?;");
+        prep.setInt(1, quizID);
+        var set = prep.executeQuery();
+        set.next();
+        int classID = set.getInt(1);
+        var students = getAllStudentsOfClass(classID);
+        for (var i : students){
+            ArrayList<String> entry = new ArrayList<>();
+            entry.add(i.firstname);
+            entry.add(i.lastname);
+            var attempt = getAttempt(quizID, i.userId);
+            if (attempt.quizBlob == null) {
+                entry.add("No attempt.");
+                entry.add("Quiz not taken.");
+                entry.add("Quiz not taken.");
+            } else {
+                entry.add(Double.toString(attempt.quizBlob.getMarks()));
+                entry.add(attempt.startTime.toString());
+                entry.add(attempt.endTime.toString());
+            } table.add(entry);
+        } return table;
     }
 
 
