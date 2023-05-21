@@ -331,6 +331,11 @@ public class SQLConnector {
         prep.executeUpdate();
     }
 
+    public ArrayList<User> getAllStudentsOfClass (int classID){
+        ArrayList<User> user = new ArrayList<>();
+
+    }
+
 
 
 
