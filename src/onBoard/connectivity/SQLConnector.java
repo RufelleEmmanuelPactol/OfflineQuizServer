@@ -328,7 +328,6 @@ public class SQLConnector {
         prep.setDate(4, q.getTimeClose().toSqlDate());
         prep.setInt(5, q.getClassID());
         prep.setInt(6, q.quizID);
-        System.out.println(prep);
         prep.executeUpdate();
     }
 
