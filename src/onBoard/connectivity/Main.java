@@ -20,6 +20,8 @@ public class Main {
         var app = req.get(0);
         System.out.println(app);
         NetworkGlobals.session().approveRequest(app.studentID, app.classID);
+
+
 //        NetworkGlobals.connectionOfficer();
 //        var question = (MultipleAnswerQuestion)q.addMultipleAnswerQuestion("What is your name?", 3, new Choice[]{Choice.A, Choice.B}).addChoice("Rufelle").addChoice("Marion").addChoice("Tulin").setMarks(10);
 //        q.addIdentificationQuestion("What is your name", "secret").setMarks(20);

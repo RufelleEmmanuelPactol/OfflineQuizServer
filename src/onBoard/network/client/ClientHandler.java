@@ -223,7 +223,12 @@ public class ClientHandler {
         NetworkUtils.sendRequest(tkn, sendSocket);
         var req = (RequestToken)NetworkUtils.getObject(receiveSocket);
         if (req.exception != null )throw (Exception)req.exception;
+
     }
+
+//    public ArrayList<ClassData> getAllClasses (int userID){
+//
+//    }
 
 
 

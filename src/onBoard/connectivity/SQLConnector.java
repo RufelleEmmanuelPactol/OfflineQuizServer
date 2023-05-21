@@ -177,6 +177,14 @@ public class SQLConnector {
 
     }
 
+//    public ArrayList<ClassData> getClasses (int userID) throws Exception{
+//        var statement = connection.prepareStatement("SELECT class_user.class_id from class_user,  where user_id = ?");
+//        statement.setInt(1, userID);
+//        var result = statement.executeQuery();
+//
+//
+//    }
+
     public ArrayList<ClassData> getOngoingQuizzes(int userID){
         try {
             var statement = connection.prepareStatement("SELECT class_id from class_user where user_id = ?");
@@ -274,6 +282,8 @@ public class SQLConnector {
         prep.setInt(2, studentID);
         prep.executeUpdate();
     }
+
+
 
 
 

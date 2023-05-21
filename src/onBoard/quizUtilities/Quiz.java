@@ -103,6 +103,52 @@ public class Quiz implements Serializable {
         } return marks;
     }
 
+    public int getQuizID()
+        return quizID;
+    }
+
+    public DateBuilder getOpens() {
+        return opens;
+    }
+
+    public DateBuilder getCloses() {
+        return closes;
+    }
+
+    public boolean isAttempted() {
+        return isAttempted;
+    }
+
+    public Quiz setQuizID(int quizID) {
+        this.quizID = quizID;
+        return this;
+    }
+
+    public Quiz setQuestions(ArrayList<Question> questions) {
+        this.questions = questions;
+        return this;
+    }
+
+    public Quiz setQuizName(String quizName) {
+        this.quizName = quizName;
+        return this;
+    }
+
+    public Quiz setOpens(DateBuilder opens) {
+        this.opens = opens;
+        return this;
+    }
+
+    public Quiz setCloses(DateBuilder closes) {
+        this.closes = closes;
+        return this;
+    }
+
+    public Quiz setAttempted(boolean attempted) {
+        isAttempted = attempted;
+        return this;
+    }
+
     public int getQuestionCount (){
         return questions.size();
     }
