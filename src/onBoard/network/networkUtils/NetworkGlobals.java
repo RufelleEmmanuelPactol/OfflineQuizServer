@@ -28,16 +28,18 @@ public class NetworkGlobals {
         return clientHandler;
     }
 
-    public static ClientHandler createSession(String username, String password) throws IOException, ClassNotFoundException, InterruptedException {
-        var watch = new Watch(5);
-        NetworkGlobals.networkTimer().timeThisWhile(watch, 5);
+    public static ClientHandler createSession(String username, String password) throws Throwable {
         if (clientHandler == null) clientHandler = new ClientHandler(username, password);
         if (!clientHandler.isAuthenticatedUser()) {
             clientHandler = null;
-            watch.watch = 10;
             throw new InvalidAuthException();
         }
+        clientHandler.getUserInfo();
         return clientHandler;
+    }
+
+    public static void mthsetnil(){
+        clientHandler = null;
     }
 
 

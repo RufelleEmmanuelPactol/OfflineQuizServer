@@ -266,6 +266,29 @@ public class ClientHandler {
 
     }
 
+    public void createClass(int proctorID, String className) throws Exception {
+        ClassData data = new ClassData();
+        data.proctorID = proctorID;
+        data.className = className;
+        RequestToken tkn = new RequestToken("CREATE CLASS", data);
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+    }
+
+    public void createUser (String firstname, String lastname, String email, String password) throws Exception{
+        User user = new User();
+        user.firstname = firstname;
+        user.lastname = lastname;
+        user.email = email;
+        RequestToken tkn = new RequestToken("CREATE USER", user);
+        tkn.response = password;
+        NetworkUtils.sendRequest(tkn, sendSocket);
+        tkn = NetworkUtils.getObject(receiveSocket);
+        if (tkn.exception!=null) throw (Exception) tkn.exception;
+        
+    }
+
 
 
 

@@ -10,6 +10,32 @@ public class MultipleAnswerQuestion extends MultipleChoiceQuestion{
     protected boolean isPartialMarks;
 
 
+    public ArrayList<Choice> getCorrectChoices() {
+        return correctChoices;
+    }
+
+    public MultipleAnswerQuestion setCorrectChoices(ArrayList<Choice> correctChoices) {
+        this.correctChoices = correctChoices;
+        return this;
+    }
+
+    public ArrayList<Choice> getAttempts() {
+        return attempts;
+    }
+
+    public MultipleAnswerQuestion setAttempts(ArrayList<Choice> attempts) {
+        this.attempts = attempts;
+        return this;
+    }
+
+    public boolean isPartialMarks() {
+        return isPartialMarks;
+    }
+
+    public MultipleAnswerQuestion setPartialMarks(boolean partialMarks) {
+        isPartialMarks = partialMarks;
+        return this;
+    }
 
     public MultipleAnswerQuestion(String question, int maxChoice, Choice[] answers) {
         super(question, maxChoice, null);

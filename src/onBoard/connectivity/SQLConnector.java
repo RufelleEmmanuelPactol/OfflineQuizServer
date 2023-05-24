@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Random;
 
 public class SQLConnector {
     private static String lucky_creds = "user_for_school";
@@ -239,7 +240,8 @@ public class SQLConnector {
                 entry.proctorName.concat(" " + result.getString("lastname"));
                 entry.quiz = Serialize.constructFromBlob(result.getBytes("quiz_blob"));
                 data.add(entry);
-            } return data;
+            }
+            return data;
 
         } catch (SQLException e){
             System.err.println(e);
@@ -349,16 +351,18 @@ public class SQLConnector {
 
     public ArrayList<ArrayList<String>> getAllAttempts(int quizID) throws Exception{
         ArrayList<ArrayList<String>> table = new ArrayList<>();
-        var prep = connection.prepareStatement("SELECT class_id from quiz where quiz_id = ?;");
+        var prep = connection.prepareStatement("SELECT class_id, quiz_blob from quiz where quiz_id = ?;");
         prep.setInt(1, quizID);
         var set = prep.executeQuery();
         set.next();
         int classID = set.getInt(1);
+        Quiz q = Serialize.constructFromBlob(set.getBytes(2));
         var students = getAllStudentsOfClass(classID);
         for (var i : students){
             ArrayList<String> entry = new ArrayList<>();
             entry.add(i.firstname);
             entry.add(i.lastname);
+            entry.add(Double.toString(q.getMarks()));
             var attempt = getAttempt(quizID, i.userId);
             if (attempt.quizBlob == null) {
                 entry.add("No attempt.");
@@ -371,6 +375,76 @@ public class SQLConnector {
             } table.add(entry);
         } return table;
     }
+
+    public void createClass (ClassData data) throws Exception {
+        var prep = connection.prepareStatement("INSERT INTO class values (null, ?, ?, ?, null)");
+        prep.setString(1, data.className);
+        prep.setString(2, codeGenerator(data.proctorID));
+        prep.setInt(3, data.proctorID);
+        prep.executeUpdate();
+    }
+
+    public void createUser (User user, String password) throws Exception {
+        var prep = connection.prepareStatement("INSERT INTO user values (null, ?, ?, ?, ?, 4, 0)");
+        prep.setString(1, user.firstname);
+        prep.setString(2, user.lastname);
+        prep.setString(3, user.email);
+        prep.setString(4, password);
+        prep.executeUpdate();
+    }
+
+    public void addQuoteRequest(ArrayList<String> quote_req) throws Exception{
+        Statement stmt;
+        String sql = null;
+        ResultSet rs = null;
+            stmt = connection.createStatement();
+            // 0-firstname, 1-lastname, 2-organization, 3-email
+            sql = "INSERT INTO quote_req values(NULL, '" + quote_req.get(0) + "','" + quote_req.get(1) + "','" + quote_req.get(2) + "','" + quote_req.get(3) + "')";
+            stmt.executeUpdate(sql);
+    }
+
+
+
+
+
+
+    private static final String[] WORDS = {
+                "apple", "banana", "orange", "grape", "pineapple", "watermelon", "strawberry", "kiwi", "mango", "peach",
+                "carrot", "potato", "tomato", "broccoli", "cabbage", "spinach", "lettuce", "corn", "onion", "garlic",
+                "dog", "cat", "elephant", "lion", "tiger", "giraffe", "monkey", "zebra", "kangaroo", "penguin",
+                "sun", "moon", "stars", "sky", "cloud", "rainbow", "ocean", "mountain", "desert", "forest",
+                "book", "pen", "pencil", "notebook", "marker", "eraser", "ruler", "scissors", "glue", "paper",
+                "car", "bicycle", "motorcycle", "bus", "train", "plane", "boat", "truck", "taxi", "helicopter",
+                "house", "apartment", "building", "castle", "cabin", "tent", "igloo", "lighthouse", "hut", "mansion",
+                "music", "song", "guitar", "piano", "drums", "violin", "trumpet", "flute", "saxophone", "harmonica",
+                "computer", "keyboard", "mouse", "monitor", "printer", "scanner", "laptop", "tablet", "smartphone", "router",
+                "football", "basketball", "tennis", "baseball", "soccer", "volleyball", "hockey", "golf", "swimming", "cricket",
+                "red", "blue", "green", "yellow", "orange", "purple", "pink", "black", "white", "gray",
+                "happy", "sad", "angry", "excited", "bored", "tired", "hungry", "thirsty", "sleepy", "scared",
+                "summer", "winter", "spring", "fall", "hot", "cold", "rainy", "sunny", "windy", "cloudy",
+                "friend", "family", "teacher", "doctor", "engineer", "artist", "musician", "writer", "chef", "athlete"
+                // Continue with the rest of the words...
+        };
+
+    public static String codeGenerator (int param) {
+            Random random = new Random();
+
+            // Select three random words
+            String randomWords = "";
+            for (int i = 0; i < 3; i++) {
+                int index = random.nextInt(WORDS.length);
+                randomWords += WORDS[index] + "-";
+            }
+
+            // Generate two random numbers
+            int number1 = Math.abs(random.nextInt()%90 + 10);
+            int number2 = Math.abs(random.nextInt()%90 + 10);
+
+            // Generate the random string
+            String randomString = randomWords + number1 + "-" + number2 + "-" + param;
+
+            return randomString;
+        }
 
 
 

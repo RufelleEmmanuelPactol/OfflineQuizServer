@@ -23,7 +23,7 @@ public class ClientMain {
                     NetworkGlobals.currentClass = new ClassData();
                     Quiz q = new Quiz("test");
                     DateBuilder db = new DateBuilder();
-                    
+
                     NetworkGlobals.currentClass.classId = 1;
                     NetworkGlobals.session().postQuiz(q);
 
@@ -34,6 +34,8 @@ public class ClientMain {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 } catch (Exception e) {
+                    throw new RuntimeException(e);
+                } catch (Throwable e) {
                     throw new RuntimeException(e);
                 }
 

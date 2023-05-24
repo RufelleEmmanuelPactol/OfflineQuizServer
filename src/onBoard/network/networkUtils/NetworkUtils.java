@@ -15,12 +15,12 @@ public class NetworkUtils {
 
     public static <T> T getObject(Socket socket) throws IOException, ClassNotFoundException, InterruptedException {
            // System.out.println("Accepting byte stream listening from port " + socket.getLocalPort());
-            var inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+            var socketInputStream = socket.getInputStream();
+            var inputStream = new DataInputStream(new BufferedInputStream(socketInputStream));
             ArrayList<Byte> byteStreamBuffer = new ArrayList<>();
-
             // sleep to add time buffer to send bytes
-          waitForBufferInstance(inputStream);
 
+            byteStreamBuffer.add((byte)socketInputStream.read());
             while (inputStream.available() != 0) byteStreamBuffer.add(inputStream.readByte());
             byte[] objectByte = new byte[byteStreamBuffer.size()];
             for (int i = 0; i < byteStreamBuffer.size(); i++)

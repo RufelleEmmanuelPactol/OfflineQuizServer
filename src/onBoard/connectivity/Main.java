@@ -13,24 +13,13 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-//        NetworkGlobals.currentClass = new ClassData();
-//        NetworkGlobals.currentClass.classId = 10;
-//        Quiz q = new Quiz("Ego");
-//        q.setTimeOpen(NetworkGlobals.getTimeNow());
-//        q.setTimeClose(NetworkGlobals.getTimeNow());
+    public static void main(String[] args) throws Throwable {
        NetworkGlobals.createSession("test", "test");
        NetworkGlobals.currentClass = new ClassData();
-       NetworkGlobals.currentClass.classId = 1;
-       var q = NetworkGlobals.session().getQuiz(379);
-       var s = NetworkGlobals.session().getQuiz(380);
-       var attempts = NetworkGlobals.session().getAllAttempts(379);
-       for (var x : attempts) {
-        for (var y : x){
-         System.out.print(y + " ");
-        }
-        System.out.println();
-       }
+       NetworkGlobals.currentClass.classId = 3;
+       var x = NetworkGlobals.session().getAttempt(384);
+        System.out.println(x.quizBlob.getMarks());
+
 
 //      //  NetworkGlobals.session().postQuiz(q);
 //        Quiz r = NetworkGlobals.session().getQuiz(377);
@@ -83,9 +72,11 @@ public class Main {
 //        Quiz quiz = conn.getQuiz(1);
 //        quiz.log();
 
+        var later = NetworkGlobals.getTimeNow();
+        later.setYear(2025);
      Quiz quiz1 = new Quiz("OOP2 Review");
      quiz1.setTimeOpen(NetworkGlobals.getTimeNow());
-     quiz1.setTimeClose(NetworkGlobals.getTimeNow());
+     quiz1.setTimeClose(later);
      quiz1.setClassID(1);
      quiz1.setTeacherID(1);
      quiz1.addMultipleAnswerQuestion("What does JDBC stand for in the context of database-driven java applications?",
@@ -145,7 +136,8 @@ public class Main {
 
      Quiz quiz2 = new Quiz("Graphic Design");
      quiz2.setTimeOpen(NetworkGlobals.getTimeNow());
-     quiz2.setTimeClose(NetworkGlobals.getTimeNow());
+
+     quiz2.setTimeClose(later);
      quiz2.setClassID(1);
      quiz2.setTeacherID(1);
      quiz2.addMultipleAnswerQuestion("How long should a heading or title be in terms of the number of words?",
